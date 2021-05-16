@@ -9,3 +9,14 @@ install_manifest.txt
 compile_commands.json
 CTestTestfile.cmake
 _deps
+
+
+build_win/
+libraries/SDL2/
+libraries/gl3w/
+libraries/sketchup/
+libraries/glm/
+
+*.skp
+*.skb
+.vscode/settings.json
