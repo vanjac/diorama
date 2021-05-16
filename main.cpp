@@ -74,7 +74,7 @@ int main(int argc, char *argv[])
 
     SDL_SetRelativeMouseMode(SDL_TRUE);
 
-    std::vector<std::string> args;
+    vector<string> args;
     args.reserve(argc);
     for (int i = 0; i < argc; i++)
         args.emplace_back(argv[i]);

@@ -1,8 +1,9 @@
 #pragma once
+#include "common.h"
 
-const std::string VERSION_DIRECTIVE = "#version 330 core\n";
+const string VERSION_DIRECTIVE = "#version 330 core\n";
 
-const std::string vertShaderSrc = R"X(
+const string vertShaderSrc = R"X(
 // defined in mesh.h
 layout(location = 0) in vec3 aPosition;
 layout(location = 1) in vec3 aNormal;
@@ -34,7 +35,7 @@ void main()
 }
 )X";
 
-const std::string fragShaderSrc = R"X(
+const string fragShaderSrc = R"X(
 in vec3 vWorldPosition;
 in vec3 vWorldNormal;
 in vec3 vSTQ;

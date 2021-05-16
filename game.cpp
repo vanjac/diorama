@@ -22,13 +22,13 @@ Game::Game(SDL_Window *window)
     , defaultMaterial(new Material)
 {}
 
-int Game::main(const std::vector<std::string> args)
+int Game::main(const vector<string> args)
 {
     if (args.size() < 2) {
         printf("please specify a path\n");
         return EXIT_FAILURE;
     }
-    std::string path = args[1];
+    string path = args[1];
     if (path.compare(path.length() - 4, 4, ".skb") == 0) {
         printf("that's a backup file! look for .skp extension instead\n");
         return EXIT_FAILURE;

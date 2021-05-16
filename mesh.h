@@ -1,7 +1,6 @@
 #pragma once
+#include "common.h"
 
-#include <vector>
-#include <memory>
 #include <GL/gl3w.h>
 #include "material.h"
 
@@ -17,12 +16,12 @@ struct Primitive
     GLuint glElementBuffer = 0;
     GLsizei numIndices = 0;
 
-    std::shared_ptr<Material> material;  // null for default material
+    shared_ptr<Material> material;  // null for default material
 };
 
 struct Mesh
 {
-    std::vector<Primitive> primitives;
+    vector<Primitive> primitives;
     // TODO edges
     // TODO bounds
 };

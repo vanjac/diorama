@@ -1,7 +1,6 @@
 #pragma once
+#include "common.h"
 
-#include <memory>
-#include <string>
 #include <initializer_list>
 #include <GL/gl3w.h>
 #include <glm/glm.hpp>
@@ -33,13 +32,13 @@ class ShaderManager
 public:
     void init();
 
-    std::shared_ptr<ShaderProgram> coloredProg, texturedProg,
+    shared_ptr<ShaderProgram> coloredProg, texturedProg,
         shiftedTextureProg, tintedTextureProg;
 
 private:
-    GLuint compileShader(GLenum type, std::string name,
-        std::initializer_list<std::string> sources);
-    GLuint linkProgram(std::string name, std::initializer_list<GLuint> shaders);
+    GLuint compileShader(GLenum type, string name,
+        std::initializer_list<string> sources);
+    GLuint linkProgram(string name, std::initializer_list<GLuint> shaders);
     void setProgramBindings(ShaderProgram &program);
     
     GLuint basicVert = 0;
@@ -48,7 +47,7 @@ private:
 
 struct Texture
 {
-    static const std::shared_ptr<Texture> NO_TEXTURE;
+    static const shared_ptr<Texture> NO_TEXTURE;
 
     GLuint glTexture = 0;
 };
@@ -60,9 +59,9 @@ struct Material
         TEXTURE_BASE
     };
 
-    std::shared_ptr<ShaderProgram> shader;  // never null
+    shared_ptr<ShaderProgram> shader;  // never null
     bool transparent = false;
-    std::shared_ptr<Texture> texture;  // never null
+    shared_ptr<Texture> texture;  // never null
     glm::vec4 color {1, 1, 1, 1};
 // https://extensions.sketchup.com/developers/sketchup_c_api/sketchup/struct_s_u_texture_ref.html#ac9341c5de53bcc1a89e51de463bd54a0
     glm::vec2 scale {1, 1};

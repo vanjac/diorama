@@ -1,7 +1,6 @@
 #include "material.h"
 #include "shadersource.h"
 #include <exception>
-#include <vector>
 
 void ShaderManager::init()
 {
@@ -46,11 +45,11 @@ void ShaderManager::init()
     glDeleteShader(tintedTextureFrag);
 }
 
-GLuint ShaderManager::compileShader(GLenum type, std::string name,
-        std::initializer_list<std::string> sources)
+GLuint ShaderManager::compileShader(GLenum type, string name,
+        std::initializer_list<string> sources)
 {
     GLuint shader = glCreateShader(type);
-    std::vector<const char *> sourcePtrs;
+    vector<const char *> sourcePtrs;
     sourcePtrs.reserve(sources.size());
     for (auto &source : sources)
         sourcePtrs.push_back(source.c_str());
@@ -63,7 +62,7 @@ GLuint ShaderManager::compileShader(GLenum type, std::string name,
     if (!compiled) {
         GLint logLen;
         glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &logLen);
-        std::unique_ptr<char[]> log(new char[logLen]);
+        unique_ptr<char[]> log(new char[logLen]);
         glGetShaderInfoLog(shader, logLen, NULL, log.get());
         printf("%s compile error: %s", name.c_str(), log.get());
         throw std::exception("Shader compile error");
@@ -71,7 +70,7 @@ GLuint ShaderManager::compileShader(GLenum type, std::string name,
     return shader;
 }
 
-GLuint ShaderManager::linkProgram(std::string name, std::initializer_list<GLuint> shaders)
+GLuint ShaderManager::linkProgram(string name, std::initializer_list<GLuint> shaders)
 {
     GLuint program = glCreateProgram();
     for (auto &shader : shaders)
@@ -83,7 +82,7 @@ GLuint ShaderManager::linkProgram(std::string name, std::initializer_list<GLuint
     if (!linked) {
         GLint logLen;
         glGetProgramiv(program, GL_INFO_LOG_LENGTH, &logLen);
-        std::unique_ptr<char[]> log(new char[logLen]);
+        unique_ptr<char[]> log(new char[logLen]);
         glGetProgramInfoLog(program, logLen, NULL, log.get());
         printf("%s link error: %s", name.c_str(), log.get());
         throw std::exception("Program link error");
@@ -107,4 +106,4 @@ void ShaderManager::setProgramBindings(ShaderProgram &program)
 }
 
 
-const std::shared_ptr<Texture> Texture::NO_TEXTURE(new Texture);
+const shared_ptr<Texture> Texture::NO_TEXTURE(new Texture);

@@ -36,7 +36,7 @@ Component * Component::parent() const
 
 void Component::setParent(Component *parent)
 {
-    std::shared_ptr<Component> sharedThis = shared_from_this();
+    shared_ptr<Component> sharedThis = shared_from_this();
     if (parent == _parent)
         return;
     if (_parent) {
@@ -51,16 +51,16 @@ void Component::setParent(Component *parent)
         parent->_children.push_back(sharedThis);
 }
 
-const std::vector<std::shared_ptr<Component>> Component::children() const
+const vector<shared_ptr<Component>> Component::children() const
 {
     return _children;
 }
 
-std::shared_ptr<Component> Component::cloneHierarchy()
+shared_ptr<Component> Component::cloneHierarchy()
 {
-    std::shared_ptr<Component> copy(new Component(*this));
+    shared_ptr<Component> copy(new Component(*this));
     for (auto &child : _children) {
-        std::shared_ptr<Component> childCopy = child->cloneHierarchy();
+        shared_ptr<Component> childCopy = child->cloneHierarchy();
         childCopy->setParent(copy.get());
     }
     return copy;

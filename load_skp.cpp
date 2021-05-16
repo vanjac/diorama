@@ -5,19 +5,16 @@
 
 #define CHECK(op) (checkError((op), __LINE__))
 
-using std::unique_ptr;
-using std::shared_ptr;
-
 static const int32_t NO_ID = -1;
 
 
 struct PrimitiveBuilder {
-    std::vector<glm::vec3> vertices, stqCoords, normals;
+    vector<glm::vec3> vertices, stqCoords, normals;
     // TODO use short instead of int?
-    std::vector<GLuint> indices;
+    vector<GLuint> indices;
 };
 
-SkpLoader::SkpLoader(std::string path, ShaderManager &shaders)
+SkpLoader::SkpLoader(string path, ShaderManager &shaders)
     : shaders(shaders)
 {
     printf("Loading from %s\n", path.c_str());
@@ -99,7 +96,7 @@ void SkpLoader::loadGlobal()
         // debug
         SUStringRef nameStr = createString();
         CHECK(SUComponentDefinitionGetName(defPair.second, &nameStr));
-        std::string name = convertStringAndRelease(nameStr);
+        string name = convertStringAndRelease(nameStr);
         printf("Definition %d: %s\n",
             defPair.first, name.c_str());
 
@@ -174,14 +171,14 @@ shared_ptr<Component> SkpLoader::loadInstance(SUComponentInstanceRef instance)
     auto defIt = componentDefinitions.find(definitionID);
     if (defIt == componentDefinitions.end()) {
         printf("  Definition %d not loaded!\n", definitionID);
-        return std::shared_ptr<Component>(new Component);
+        return shared_ptr<Component>(new Component);
     }
 
     size_t numInstances;
     // NOT NumUsedInstances!
     CHECK(SUComponentDefinitionGetNumInstances(definition, &numInstances));
 
-    std::shared_ptr<Component> component;
+    shared_ptr<Component> component;
     if (numInstances == 1) {
         printf("  (unique)");
         component = defIt->second;  // unique, don't clone hierarchy
@@ -330,7 +327,7 @@ shared_ptr<Material> SkpLoader::loadMaterial(SUMaterialRef suMaterial)
 {
     SUStringRef nameStr = createString();
     CHECK(SUMaterialGetName(suMaterial, &nameStr));
-    std::string name = convertStringAndRelease(nameStr);
+    string name = convertStringAndRelease(nameStr);
     printf("Material %d: %s\n", getID(SUMaterialToEntity(suMaterial)),
         name.c_str());
 
@@ -394,7 +391,7 @@ shared_ptr<Texture> SkpLoader::loadTexture(SUTextureRef suTexture)
 {
     SUStringRef fileNameStr = createString();
     CHECK(SUTextureGetFileName(suTexture, &fileNameStr));
-    std::string fileName = convertStringAndRelease(fileNameStr);
+    string fileName = convertStringAndRelease(fileNameStr);
 
     auto texIt = loadedTextures.find(fileName);
     if (texIt != loadedTextures.end()) {
@@ -449,14 +446,14 @@ SUStringRef SkpLoader::createString()
     return str;
 }
 
-std::string SkpLoader::convertStringAndRelease(SUStringRef &suStr)
+string SkpLoader::convertStringAndRelease(SUStringRef &suStr)
 {
     size_t len = 0;
     CHECK(SUStringGetUTF8Length(suStr, &len));
     unique_ptr<char[]> utf8(new char[len + 1]);
     CHECK(SUStringGetUTF8(suStr, len + 1, utf8.get(), &len));
     CHECK(SUStringRelease(&suStr));
-    std::string stdStr(utf8.get());
+    string stdStr(utf8.get());
     return stdStr;
 }
 
