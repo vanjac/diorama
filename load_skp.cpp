@@ -233,11 +233,14 @@ shared_ptr<Mesh> SkpLoader::loadMesh(SUEntitiesRef entities)
         CHECK(SUMeshHelperGetNumVertices(helper, &numVertices));
 
         unique_ptr<SUPoint3D[]> suVertices(new SUPoint3D[numVertices]);
-        CHECK(SUMeshHelperGetVertices(helper, numVertices, suVertices.get(), &numVertices));
+        CHECK(SUMeshHelperGetVertices(helper, numVertices,
+            suVertices.get(), &numVertices));
         unique_ptr<SUPoint3D[]> suSTQCoords(new SUPoint3D[numVertices]);
-        CHECK(SUMeshHelperGetFrontSTQCoords(helper, numVertices, suSTQCoords.get(), &numVertices));
+        CHECK(SUMeshHelperGetFrontSTQCoords(helper, numVertices,
+            suSTQCoords.get(), &numVertices));
         unique_ptr<SUVector3D[]> suNormals(new SUVector3D[numVertices]);
-        CHECK(SUMeshHelperGetNormals(helper, numVertices, suNormals.get(), &numVertices));
+        CHECK(SUMeshHelperGetNormals(helper, numVertices,  
+            suNormals.get(), &numVertices));
 
         size_t numTriangles;
         CHECK(SUMeshHelperGetNumTriangles(helper, &numTriangles));
@@ -292,18 +295,24 @@ shared_ptr<Mesh> SkpLoader::loadMesh(SUEntitiesRef entities)
         glGenBuffers(Primitive::ATTRIB_MAX, primitive.glAttribBuffers);
 
         size_t vertexBufferSize = build.vertices.size() * sizeof(glm::vec3);
-        glBindBuffer(GL_ARRAY_BUFFER, primitive.glAttribBuffers[Primitive::ATTRIB_POSITION]);
-        glBufferData(GL_ARRAY_BUFFER, vertexBufferSize, &build.vertices[0], GL_STATIC_DRAW);
+        glBindBuffer(GL_ARRAY_BUFFER,
+                     primitive.glAttribBuffers[Primitive::ATTRIB_POSITION]);
+        glBufferData(GL_ARRAY_BUFFER, vertexBufferSize,
+                     &build.vertices[0], GL_STATIC_DRAW);
         glVertexAttribPointer(Primitive::ATTRIB_POSITION, 3, GL_FLOAT,
                               GL_FALSE, 0, (void *)0);
 
-        glBindBuffer(GL_ARRAY_BUFFER, primitive.glAttribBuffers[Primitive::ATTRIB_NORMAL]);
-        glBufferData(GL_ARRAY_BUFFER, vertexBufferSize, &build.normals[0], GL_STATIC_DRAW);
+        glBindBuffer(GL_ARRAY_BUFFER,
+                     primitive.glAttribBuffers[Primitive::ATTRIB_NORMAL]);
+        glBufferData(GL_ARRAY_BUFFER, vertexBufferSize,
+                     &build.normals[0], GL_STATIC_DRAW);
         glVertexAttribPointer(Primitive::ATTRIB_NORMAL, 3, GL_FLOAT,
                               GL_FALSE, 0, (void *)0);
 
-        glBindBuffer(GL_ARRAY_BUFFER, primitive.glAttribBuffers[Primitive::ATTRIB_STQ]);
-        glBufferData(GL_ARRAY_BUFFER, vertexBufferSize, &build.stqCoords[0], GL_STATIC_DRAW);
+        glBindBuffer(GL_ARRAY_BUFFER,
+                     primitive.glAttribBuffers[Primitive::ATTRIB_STQ]);
+        glBufferData(GL_ARRAY_BUFFER, vertexBufferSize,
+                     &build.stqCoords[0], GL_STATIC_DRAW);
         glVertexAttribPointer(Primitive::ATTRIB_STQ, 3, GL_FLOAT,
                               GL_FALSE, 0, (void *)0);
 
@@ -314,7 +323,8 @@ shared_ptr<Mesh> SkpLoader::loadMesh(SUEntitiesRef entities)
         glGenBuffers(1, &primitive.glElementBuffer);
         // binding is stored in VAO
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, primitive.glElementBuffer);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, build.indices.size() * sizeof(GLuint),
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER,
+                     build.indices.size() * sizeof(GLuint),
                      &build.indices[0], GL_STATIC_DRAW);
         primitive.numIndices = build.indices.size();
     }  // for each material primitive

@@ -70,7 +70,8 @@ GLuint ShaderManager::compileShader(GLenum type, string name,
     return shader;
 }
 
-GLuint ShaderManager::linkProgram(string name, std::initializer_list<GLuint> shaders)
+GLuint ShaderManager::linkProgram(string name,
+                                  std::initializer_list<GLuint> shaders)
 {
     GLuint program = glCreateProgram();
     for (auto &shader : shaders)
@@ -92,8 +93,10 @@ GLuint ShaderManager::linkProgram(string name, std::initializer_list<GLuint> sha
 
 void ShaderManager::setProgramBindings(ShaderProgram &program)
 {
-    program.baseColorLoc = glGetUniformLocation(program.glProgram, "BaseColor");
-    program.textureScaleLoc = glGetUniformLocation(program.glProgram, "TextureScale");
+    program.baseColorLoc = glGetUniformLocation(
+        program.glProgram, "BaseColor");
+    program.textureScaleLoc = glGetUniformLocation(
+        program.glProgram, "TextureScale");
 
     glUseProgram(program.glProgram);
     GLuint transformIdx = glGetUniformBlockIndex(
@@ -101,7 +104,8 @@ void ShaderManager::setProgramBindings(ShaderProgram &program)
     glUniformBlockBinding(program.glProgram,
         transformIdx, ShaderProgram::BIND_TRANSFORM);
 
-    GLint baseTextureLoc = glGetUniformLocation(program.glProgram, "BaseTexture");
+    GLint baseTextureLoc = glGetUniformLocation(
+        program.glProgram, "BaseTexture");
     glUniform1i(baseTextureLoc, Material::TEXTURE_BASE);
 }
 

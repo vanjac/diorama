@@ -42,7 +42,8 @@ void Component::setParent(Component *parent)
     if (_parent) {
         auto &childrenVec = _parent->_children;
         // TODO fast remove without preserving order
-        auto childIt = std::find(childrenVec.begin(), childrenVec.end(), sharedThis);
+        auto childIt = std::find(childrenVec.begin(), childrenVec.end(),
+                                 sharedThis);
         if (childIt != childrenVec.end())
             childrenVec.erase(childIt);
     }

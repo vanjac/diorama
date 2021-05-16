@@ -192,7 +192,8 @@ void Game::renderHierarchy(Component &component, Material *inherit,
 
         // TODO bad to update for every component?
         glBindBuffer(GL_UNIFORM_BUFFER, transformUBO);
-        glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(TransformBlock), &transform);
+        glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(TransformBlock),
+                        &transform);
 
         for (auto &primitive : component.mesh->primitives) {
             renderPrimitive(primitive, inherit, transparent);

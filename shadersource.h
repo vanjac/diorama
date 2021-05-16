@@ -31,7 +31,8 @@ void main()
     vWorldNormal = normalize(mat3(NormalMatrix) * aNormal);
     vSTQ = vec3(aSTQ.st * TextureScale, aSTQ.p);
 
-    gl_Position = ProjectionMatrix * ViewMatrix * ModelMatrix * vec4(aPosition, 1.0);
+    gl_Position = ProjectionMatrix * ViewMatrix * ModelMatrix
+        * vec4(aPosition, 1.0);
 }
 )X";
 
