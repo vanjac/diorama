@@ -1,5 +1,6 @@
 #include "game.h"
 #include "load_skp.h"
+#include <GL/gl3w.h>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
@@ -236,7 +237,7 @@ void Game::setMaterial(Material *material, bool inherited)
     glUniform2fv(material->shader->textureScaleLoc, 1, glm::value_ptr(scale));
 }
 
-void Game::setTexture(GLuint unit, GLuint texture)
+void Game::setTexture(int unit, GLTexture texture)
 {
     glActiveTexture(GL_TEXTURE0 + unit);
     glBindTexture(GL_TEXTURE_2D, texture);

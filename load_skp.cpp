@@ -1,6 +1,7 @@
 #include "load_skp.h"
 #include <exception>
 #include <map>
+#include <GL/gl3w.h>
 #include <glm/gtc/type_ptr.hpp>
 
 #define CHECK(op) (checkError((op), __LINE__))

@@ -2,8 +2,8 @@
 #include "common.h"
 
 #include <SDL.h>
-#include <GL/gl3w.h>
 #include <glm/glm.hpp>
+#include "glutils.h"
 #include "world.h"
 
 namespace diorama {
@@ -25,7 +25,7 @@ private:
     void Game::renderPrimitive(Primitive &primitive,
         Material *inherit, bool transparent);
     void Game::setMaterial(Material *material, bool inherited);
-    void Game::setTexture(GLuint unit, GLuint texture);
+    void Game::setTexture(int unit, GLTexture texture);
 
     SDL_Window *window;
     World world;
@@ -35,7 +35,7 @@ private:
     shared_ptr<Material> defaultMaterial;
 
     TransformBlock transform;
-    GLuint transformUBO;  // shared between all programs
+    GLBuffer transformUBO;  // shared between all programs
 
     float camYaw = 0, camPitch = 0;
     glm::vec3 camPos{0, 0, 0};

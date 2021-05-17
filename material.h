@@ -1,8 +1,8 @@
 #pragma once
 #include "common.h"
 
+#include "glutils.h"
 #include <initializer_list>
-#include <GL/gl3w.h>
 #include <glm/glm.hpp>
 
 namespace diorama {
@@ -24,9 +24,9 @@ struct ShaderProgram
         BIND_TRANSFORM
     };
 
-    GLuint glProgram = 0;
-    GLint baseColorLoc = -1;
-    GLint textureScaleLoc = -1;
+    GLProgram glProgram = 0;
+    GLUniformLocation baseColorLoc = -1;
+    GLUniformLocation textureScaleLoc = -1;
 };
 
 class ShaderManager
@@ -38,12 +38,12 @@ public:
         shiftedTextureProg, tintedTextureProg;
 
 private:
-    GLuint compileShader(GLenum type, string name,
+    GLShader compileShader(GLType type, string name,
         std::initializer_list<string> sources);
-    GLuint linkProgram(string name, std::initializer_list<GLuint> shaders);
+    GLProgram linkProgram(string name, std::initializer_list<GLShader> shaders);
     void setProgramBindings(ShaderProgram &program);
-    
-    GLuint basicVert = 0;
+
+    GLShader basicVert = 0;
 };
 
 
@@ -51,7 +51,7 @@ struct Texture
 {
     static const shared_ptr<Texture> NO_TEXTURE;
 
-    GLuint glTexture = 0;
+    GLTexture glTexture = 0;
 };
 
 struct Material

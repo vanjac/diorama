@@ -1,6 +1,7 @@
 #include "material.h"
 #include "shadersource.h"
 #include <exception>
+#include <GL/gl3w.h>
 
 namespace diorama {
 
@@ -11,17 +12,17 @@ void ShaderManager::init()
 {
     basicVert = compileShader(GL_VERTEX_SHADER, "Vertex",
         {VERSION_DIRECTIVE, vertShaderSrc});
-    GLuint coloredFrag = compileShader(GL_FRAGMENT_SHADER, "Fragment",
+    GLShader coloredFrag = compileShader(GL_FRAGMENT_SHADER, "Fragment",
         {VERSION_DIRECTIVE, fragShaderSrc});
-    GLuint texturedFrag = compileShader(GL_FRAGMENT_SHADER, "Fragment",
+    GLShader texturedFrag = compileShader(GL_FRAGMENT_SHADER, "Fragment",
         {VERSION_DIRECTIVE,
         "#define BASE_TEXTURE\n",
         fragShaderSrc});
-    GLuint shiftedTextureFrag = compileShader(GL_FRAGMENT_SHADER, "Fragment",
+    GLShader shiftedTextureFrag = compileShader(GL_FRAGMENT_SHADER, "Fragment",
         {VERSION_DIRECTIVE,
         "#define BASE_TEXTURE\n#define COLORIZE_SHIFT\n",
         fragShaderSrc});
-    GLuint tintedTextureFrag = compileShader(GL_FRAGMENT_SHADER, "Fragment",
+    GLShader tintedTextureFrag = compileShader(GL_FRAGMENT_SHADER, "Fragment",
         {VERSION_DIRECTIVE,
         "#define BASE_TEXTURE\n#define COLORIZE_TINT\n",
         fragShaderSrc});
@@ -50,10 +51,10 @@ void ShaderManager::init()
     glDeleteShader(tintedTextureFrag);
 }
 
-GLuint ShaderManager::compileShader(GLenum type, string name,
+GLShader ShaderManager::compileShader(GLenum type, string name,
         std::initializer_list<string> sources)
 {
-    GLuint shader = glCreateShader(type);
+    GLShader shader = glCreateShader(type);
     vector<const char *> sourcePtrs;
     sourcePtrs.reserve(sources.size());
     for (auto &source : sources)
@@ -75,10 +76,10 @@ GLuint ShaderManager::compileShader(GLenum type, string name,
     return shader;
 }
 
-GLuint ShaderManager::linkProgram(string name,
-                                  std::initializer_list<GLuint> shaders)
+GLProgram ShaderManager::linkProgram(string name,
+        std::initializer_list<GLShader> shaders)
 {
-    GLuint program = glCreateProgram();
+    GLProgram program = glCreateProgram();
     for (auto &shader : shaders)
         glAttachShader(program, shader);
 
@@ -109,7 +110,7 @@ void ShaderManager::setProgramBindings(ShaderProgram &program)
     glUniformBlockBinding(program.glProgram,
         transformIdx, ShaderProgram::BIND_TRANSFORM);
 
-    GLint baseTextureLoc = glGetUniformLocation(
+    GLUniformLocation baseTextureLoc = glGetUniformLocation(
         program.glProgram, "BaseTexture");
     glUniform1i(baseTextureLoc, Material::TEXTURE_BASE);
 }
