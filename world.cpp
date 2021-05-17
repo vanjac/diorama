@@ -23,11 +23,16 @@ void World::setRoot(shared_ptr<Component> root)
 void World::addComponent(Component *component)
 {
     printf("add component %s\n", component->name.c_str());  // TODO
+    names[component->name].push_back(component);
 }
 
 void World::removeComponent(Component *component)
 {
     printf("remove component %s\n", component->name.c_str());  // TODO
+    auto &nameVec = names[component->name];
+    auto compIt = std::find(nameVec.begin(), nameVec.end(), component);
+    if (compIt != nameVec.end())
+        nameVec.erase(compIt);
 }
 
 void World::addHierarchy(Component *component)
@@ -44,6 +49,14 @@ void World::removeHierarchy(Component *component)
     for (auto &child : component->children()) {
         removeHierarchy(child.get());
     }
+}
+
+Component * World::findComponent(string glob) const
+{
+    findComponents(glob, [](Component &c){
+        return &c;
+    });
+    return nullptr;
 }
 
 }  // namespace
