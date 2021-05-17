@@ -4,6 +4,9 @@
 
 namespace diorama {
 
+const shared_ptr<Texture> Texture::NO_TEXTURE(new Texture);
+
+
 void ShaderManager::init()
 {
     basicVert = compileShader(GL_VERTEX_SHADER, "Vertex",
@@ -110,8 +113,5 @@ void ShaderManager::setProgramBindings(ShaderProgram &program)
         program.glProgram, "BaseTexture");
     glUniform1i(baseTextureLoc, Material::TEXTURE_BASE);
 }
-
-
-const shared_ptr<Texture> Texture::NO_TEXTURE(new Texture);
 
 }  // namespace

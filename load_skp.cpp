@@ -7,7 +7,7 @@
 
 namespace diorama {
 
-static const int32_t NO_ID = -1;
+const int32_t NO_ID = -1;
 
 
 struct PrimitiveBuilder {
