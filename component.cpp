@@ -6,14 +6,14 @@ namespace diorama {
 Component::Component()
 {}
 
-Component::Component(Component const &other)
+Component::Component(const Component &other)
     : name(other.name)
     , mesh(other.mesh)
     , material(other.material)
     , _tLocal(other._tLocal)
 {}
 
-Component & Component::operator=(Component const &rhs)
+Component & Component::operator=(const Component &rhs)
 {
     this->name = rhs.name;
     this->mesh = rhs.mesh;
