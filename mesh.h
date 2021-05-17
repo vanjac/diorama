@@ -13,9 +13,9 @@ struct Primitive
         ATTRIB_POSITION, ATTRIB_NORMAL, ATTRIB_STQ, ATTRIB_MAX
     };
 
-    GLVertexArray glVertexArray = 0;
-    GLBuffer glAttribBuffers[ATTRIB_MAX] {0};
-    GLBuffer glElementBuffer = 0;
+    GLVertexArray vertexArray = 0;
+    GLBuffer attribBuffers[ATTRIB_MAX] {0};
+    GLBuffer elementBuffer = 0;
     int numIndices = 0;
 
     shared_ptr<Material> material;  // null for default material

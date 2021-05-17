@@ -220,7 +220,7 @@ void Game::renderPrimitive(Primitive &primitive, Material *inherit,
     if (mat->transparent != transparent)
         return;
 
-    glBindVertexArray(primitive.glVertexArray);
+    glBindVertexArray(primitive.vertexArray);
     setMaterial(mat, mat == inherit);
     glDrawElements(GL_TRIANGLES, primitive.numIndices,
                     GL_UNSIGNED_INT, (void *)0);

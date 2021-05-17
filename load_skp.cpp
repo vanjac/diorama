@@ -296,29 +296,29 @@ shared_ptr<Mesh> SkpLoader::loadMesh(SUEntitiesRef entities)
             }
         }
 
-        glGenVertexArrays(1, &primitive.glVertexArray);
-        glBindVertexArray(primitive.glVertexArray);
+        glGenVertexArrays(1, &primitive.vertexArray);
+        glBindVertexArray(primitive.vertexArray);
 
         // generate buffers for each vertex attribute
-        glGenBuffers(Primitive::ATTRIB_MAX, primitive.glAttribBuffers);
+        glGenBuffers(Primitive::ATTRIB_MAX, primitive.attribBuffers);
 
         size_t vertexBufferSize = build.vertices.size() * sizeof(glm::vec3);
         glBindBuffer(GL_ARRAY_BUFFER,
-                     primitive.glAttribBuffers[Primitive::ATTRIB_POSITION]);
+                     primitive.attribBuffers[Primitive::ATTRIB_POSITION]);
         glBufferData(GL_ARRAY_BUFFER, vertexBufferSize,
                      &build.vertices[0], GL_STATIC_DRAW);
         glVertexAttribPointer(Primitive::ATTRIB_POSITION, 3, GL_FLOAT,
                               GL_FALSE, 0, (void *)0);
 
         glBindBuffer(GL_ARRAY_BUFFER,
-                     primitive.glAttribBuffers[Primitive::ATTRIB_NORMAL]);
+                     primitive.attribBuffers[Primitive::ATTRIB_NORMAL]);
         glBufferData(GL_ARRAY_BUFFER, vertexBufferSize,
                      &build.normals[0], GL_STATIC_DRAW);
         glVertexAttribPointer(Primitive::ATTRIB_NORMAL, 3, GL_FLOAT,
                               GL_FALSE, 0, (void *)0);
 
         glBindBuffer(GL_ARRAY_BUFFER,
-                     primitive.glAttribBuffers[Primitive::ATTRIB_STQ]);
+                     primitive.attribBuffers[Primitive::ATTRIB_STQ]);
         glBufferData(GL_ARRAY_BUFFER, vertexBufferSize,
                      &build.stqCoords[0], GL_STATIC_DRAW);
         glVertexAttribPointer(Primitive::ATTRIB_STQ, 3, GL_FLOAT,
@@ -328,9 +328,9 @@ shared_ptr<Mesh> SkpLoader::loadMesh(SUEntitiesRef entities)
             glEnableVertexAttribArray(i);
 
         // generate buffer for element indices
-        glGenBuffers(1, &primitive.glElementBuffer);
+        glGenBuffers(1, &primitive.elementBuffer);
         // binding is stored in VAO
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, primitive.glElementBuffer);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, primitive.elementBuffer);
         glBufferData(GL_ELEMENT_ARRAY_BUFFER,
                      build.indices.size() * sizeof(GLuint),
                      &build.indices[0], GL_STATIC_DRAW);
