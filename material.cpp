@@ -51,7 +51,7 @@ void ShaderManager::init()
     glDeleteShader(tintedTextureFrag);
 }
 
-GLShader ShaderManager::compileShader(GLenum type, string name,
+GLShader ShaderManager::compileShader(GLType type, string name,
         std::initializer_list<string> sources)
 {
     GLShader shader = glCreateShader(type);
