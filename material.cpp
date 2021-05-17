@@ -2,6 +2,8 @@
 #include "shadersource.h"
 #include <exception>
 
+namespace diorama {
+
 void ShaderManager::init()
 {
     basicVert = compileShader(GL_VERTEX_SHADER, "Vertex",
@@ -111,3 +113,5 @@ void ShaderManager::setProgramBindings(ShaderProgram &program)
 
 
 const shared_ptr<Texture> Texture::NO_TEXTURE(new Texture);
+
+}  // namespace

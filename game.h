@@ -8,6 +8,8 @@
 #include "material.h"
 #include "component.h"
 
+namespace diorama {
+
 class Game
 {
 public:
@@ -43,3 +45,5 @@ private:
     glm::vec3 flyNeg{0, 0, 0};
     float flySpeed = 70.0f;  // inches per second
 };
+
+}  // namespace

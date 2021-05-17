@@ -3,6 +3,8 @@
 
 #include <glm/glm.hpp>
 
+namespace diorama {
+
 class Transform
 {
 public:
@@ -41,3 +43,5 @@ public:
 private:
     glm::mat4 mat;
 };
+
+}  // namespace

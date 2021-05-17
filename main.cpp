@@ -80,7 +80,7 @@ int main(int argc, char *argv[])
     for (int i = 0; i < argc; i++)
         args.emplace_back(argv[i]);
 
-    Game game(window);
+    diorama::Game game(window);
     int result;
     try {
         result = game.main(args);

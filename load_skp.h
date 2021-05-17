@@ -7,6 +7,8 @@
 #include "material.h"
 #include "component.h"
 
+namespace diorama {
+
 class SkpLoader
 {
 public:
@@ -61,3 +63,5 @@ private:
     // because we can't cast Image to ComponentInstance for some reason :(
     std::unordered_map<int32_t, SUComponentInstanceRef> imageInstances;
 };
+
+}  // namespace

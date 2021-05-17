@@ -1,5 +1,7 @@
 #include "component.h"
 
+namespace diorama {
+
 Component::Component()
 {}
 
@@ -66,3 +68,5 @@ shared_ptr<Component> Component::cloneHierarchy()
     }
     return copy;
 }
+
+}  // namespace

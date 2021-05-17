@@ -5,6 +5,8 @@
 
 #define CHECK(op) (checkError((op), __LINE__))
 
+namespace diorama {
+
 static const int32_t NO_ID = -1;
 
 
@@ -526,3 +528,5 @@ SUResult SkpLoader::checkError(SUResult result, int line)
     }
     return result;
 }
+
+}  // namespace

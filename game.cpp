@@ -3,6 +3,8 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+namespace diorama {
+
 const float PROJ_FOV = glm::radians(60.0f);
 const float PROJ_NEAR = 5;
 const float PROJ_FAR = 10000;
@@ -239,3 +241,5 @@ void Game::setTexture(GLuint unit, GLuint texture)
     glActiveTexture(GL_TEXTURE0 + unit);
     glBindTexture(GL_TEXTURE_2D, texture);
 }
+
+}  // namespace

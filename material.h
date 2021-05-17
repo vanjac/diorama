@@ -5,6 +5,8 @@
 #include <GL/gl3w.h>
 #include <glm/glm.hpp>
 
+namespace diorama {
+
 // matches interface block in shader
 // TODO: split off Model and Normal?
 struct TransformBlock
@@ -66,3 +68,5 @@ struct Material
 // https://extensions.sketchup.com/developers/sketchup_c_api/sketchup/struct_s_u_texture_ref.html#ac9341c5de53bcc1a89e51de463bd54a0
     glm::vec2 scale {1, 1};
 };
+
+}  // namespace

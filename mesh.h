@@ -4,6 +4,8 @@
 #include <GL/gl3w.h>
 #include "material.h"
 
+namespace diorama {
+
 struct Primitive
 {
     enum VertexAttributes
@@ -25,3 +27,5 @@ struct Mesh
     // TODO edges
     // TODO bounds
 };
+
+}  // namespace

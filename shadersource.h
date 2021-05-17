@@ -1,6 +1,8 @@
 #pragma once
 #include "common.h"
 
+namespace diorama {
+
 const string VERSION_DIRECTIVE = "#version 330 core\n";
 
 const string vertShaderSrc = R"X(
@@ -196,3 +198,5 @@ void main(void)
     fColor = color;
 }
 )X";
+
+}  // namespace

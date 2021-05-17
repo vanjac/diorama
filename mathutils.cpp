@@ -1,6 +1,8 @@
 #include "mathutils.h"
 #include <glm/ext/matrix_transform.hpp>
 
+namespace diorama {
+
 // blender coordinate system
 // (the only good coordinate system)
 const glm::vec3 Transform::RIGHT    (1, 0, 0);
@@ -98,3 +100,5 @@ glm::vec3 Transform::transformPoint(glm::vec3 v) const
 {
     return mat * glm::vec4(v, 1);
 }
+
+}  // mamespace

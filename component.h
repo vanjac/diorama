@@ -5,6 +5,8 @@
 #include "mesh.h"
 #include "material.h"
 
+namespace diorama {
+
 // should always be owned by a shared_ptr (never on the stack)
 class Component
     : public std::enable_shared_from_this<Component>
@@ -36,3 +38,5 @@ private:
     Component *_parent = nullptr;  // instead of weak_ptr
     vector<shared_ptr<Component>> _children;
 };
+
+}  // namespace
