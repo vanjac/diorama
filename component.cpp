@@ -51,9 +51,12 @@ void Component::setParent(Component *parent)
             childrenVec.erase(childIt);
     }
     _parent = parent;
-    if (parent)
+    if (parent) {
         parent->_children.push_back(sharedThis);
-    setWorld(parent->world());
+        setWorld(parent->world());
+    } else {
+        setWorld(nullptr);
+    }
 }
 
 const vector<shared_ptr<Component>> Component::children() const
