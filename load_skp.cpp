@@ -95,14 +95,14 @@ void SkpLoader::loadGlobal()
     }
 
     for (auto &defPair : defs) {
-        // debug
+        shared_ptr<Component> component(new Component);
+
         SUStringRef nameStr = createString();
         CHECK(SUComponentDefinitionGetName(defPair.second, &nameStr));
-        string name = convertStringAndRelease(nameStr);
+        component->name = convertStringAndRelease(nameStr);
         printf("Definition %d: %s\n",
-            defPair.first, name.c_str());
+            defPair.first, component->name.c_str());
 
-        shared_ptr<Component> component(new Component);
         SUEntitiesRef entities = SU_INVALID;
         CHECK(SUComponentDefinitionGetEntities(defPair.second, &entities));
         // component definitions don't seem to use materials
@@ -117,6 +117,7 @@ void SkpLoader::loadGlobal()
 shared_ptr<Component> SkpLoader::loadRoot()
 {
     shared_ptr<Component> root(new Component);
+    root->name = "root";
     SUEntitiesRef entities = SU_INVALID;
     CHECK(SUModelGetEntities(model, &entities));
     printf("Model:\n");
@@ -190,9 +191,13 @@ shared_ptr<Component> SkpLoader::loadInstance(SUComponentInstanceRef instance)
 
     SUStringRef nameStr = createString();
     CHECK(SUComponentInstanceGetName(instance, &nameStr));
-    component->name = convertStringAndRelease(nameStr);
-    printf("  Instance %s of %d\n", component->name.c_str(),
+    string name = convertStringAndRelease(nameStr);
+    printf("  Instance %s of %d\n", name.c_str(),
         definitionID);
+    // instances with empty names use the name of their definition
+    // this matches the behavior of Dynamic Components
+    if (!name.empty())
+        component->name = name;
 
     SUTransformation suTransform;
     CHECK(SUComponentInstanceGetTransform(instance, &suTransform));
