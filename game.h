@@ -4,9 +4,7 @@
 #include <SDL.h>
 #include <GL/gl3w.h>
 #include <glm/glm.hpp>
-#include "mesh.h"
-#include "material.h"
-#include "component.h"
+#include "world.h"
 
 namespace diorama {
 
@@ -30,7 +28,7 @@ private:
     void Game::setTexture(GLuint unit, GLuint texture);
 
     SDL_Window *window;
-    shared_ptr<Component> root;
+    World world;
     bool running = true;
 
     ShaderManager shaders;

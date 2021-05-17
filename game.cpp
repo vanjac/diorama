@@ -60,7 +60,7 @@ int Game::main(const vector<string> args)
     {
         SkpLoader loader(path, shaders);
         loader.loadGlobal();
-        root = loader.loadRoot();
+        world.setRoot(loader.loadRoot());
     }
 
 
@@ -113,11 +113,11 @@ int Game::main(const vector<string> args)
         transform.ViewMatrix = camTransform.inverse().matrix();
 
         transform.ModelMatrix = glm::mat4(1);
-        renderHierarchy(*root, defaultMaterial.get(), false);
+        renderHierarchy(*world.root(), defaultMaterial.get(), false);
         glEnable(GL_BLEND);
         glDepthMask(GL_FALSE);
         transform.ModelMatrix = glm::mat4(1);
-        renderHierarchy(*root, defaultMaterial.get(), true);
+        renderHierarchy(*world.root(), defaultMaterial.get(), true);
         glDisable(GL_BLEND);
         glDepthMask(GL_TRUE);
 
