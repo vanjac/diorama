@@ -31,7 +31,7 @@ void main()
 {
     vWorldPosition = vec3(ModelMatrix * vec4(aPosition, 1));
     vWorldNormal = normalize(mat3(NormalMatrix) * aNormal);
-    vSTQ = vec3(aSTQ.st * TextureScale, aSTQ.p);
+    vSTQ = vec3(vec2(aSTQ.s, -aSTQ.t) * TextureScale, aSTQ.p);
 
     gl_Position = ProjectionMatrix * ViewMatrix * ModelMatrix
         * vec4(aPosition, 1.0);
@@ -185,7 +185,7 @@ void main(void)
 #endif
 #ifdef BASE_TEXTURE
     // perspective warping with homogeneous coordinates
-    vec2 uv = vec2(vSTQ.s, -vSTQ.t) / vSTQ.p;
+    vec2 uv = vSTQ.st / vSTQ.p;
     color *= texture(BaseTexture, uv);
 #endif
 #ifdef CUTOUT
