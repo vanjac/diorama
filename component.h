@@ -25,8 +25,8 @@ public:
     // overrides defaults in mesh and children. null for default
     shared_ptr<Material> material;
 
-    const Transform & local() const;
-    Transform & localMut();
+    const Transform & tLocal() const;
+    Transform & tLocalMut();
 
     Component * parent() const;
     void setParent(Component *parent);
@@ -38,7 +38,7 @@ public:
     void setWorld(World *world);  // called by World
 
 private:
-    Transform _local;
+    Transform _tLocal;
     // TODO cache world matrix
 
     Component *_parent = nullptr;  // instead of weak_ptr

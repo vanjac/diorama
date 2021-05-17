@@ -182,7 +182,7 @@ void Game::renderHierarchy(Component &component, Material *inherit,
     if (component.material)
         inherit = component.material.get();
     glm::mat4 prevModel = transform.ModelMatrix;
-    transform.ModelMatrix *= component.local().matrix();
+    transform.ModelMatrix *= component.tLocal().matrix();
     if (component.mesh) {
         glm::mat3 model3 = transform.ModelMatrix;
         transform.NormalMatrix = glm::transpose(glm::inverse(model3));

@@ -10,7 +10,7 @@ Component::Component(Component const &other)
     : name(other.name)
     , mesh(other.mesh)
     , material(other.material)
-    , _local(other._local)
+    , _tLocal(other._tLocal)
 {}
 
 Component & Component::operator=(Component const &rhs)
@@ -18,18 +18,18 @@ Component & Component::operator=(Component const &rhs)
     this->name = rhs.name;
     this->mesh = rhs.mesh;
     this->material = rhs.material;
-    this->_local = rhs._local;
+    this->_tLocal = rhs._tLocal;
     return *this;
 }
 
-const Transform & Component::local() const
+const Transform & Component::tLocal() const
 {
-    return _local;
+    return _tLocal;
 }
 
-Transform & Component::localMut()
+Transform & Component::tLocalMut()
 {
-    return _local;
+    return _tLocal;
 }
 
 Component * Component::parent() const

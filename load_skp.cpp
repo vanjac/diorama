@@ -197,7 +197,7 @@ shared_ptr<Component> SkpLoader::loadInstance(SUComponentInstanceRef instance)
     SUTransformation suTransform;
     CHECK(SUComponentInstanceGetTransform(instance, &suTransform));
     // both glm and sketchup use column-major order
-    component->localMut() = Transform(glm::make_mat4(suTransform.values));
+    component->tLocalMut() = Transform(glm::make_mat4(suTransform.values));
 
     SUDrawingElementRef element = SUComponentInstanceToDrawingElement(instance);
     SUMaterialRef material = SU_INVALID;
