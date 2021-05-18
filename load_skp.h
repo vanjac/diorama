@@ -40,7 +40,6 @@ private:
     void convertVec3Array(T *suVectors, size_t count,
                           vector<glm::vec3> &outVectors)
     {
-        outVectors.reserve(outVectors.size() + count);
         for (int i = 0; i < count; i++) {
             T &vec = suVectors[i];
             outVectors.push_back(glm::vec3(

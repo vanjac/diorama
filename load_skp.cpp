@@ -273,7 +273,6 @@ shared_ptr<Mesh> SkpLoader::loadMesh(SUEntitiesRef entities)
         convertVec3Array(suVertices.get(), numVertices, build.vertices);
         convertVec3Array(suSTQCoords.get(), numVertices, build.stqCoords);
         convertVec3Array(suNormals.get(), numVertices, build.normals);
-        build.indices.reserve(build.indices.size() + numIndices);
         for (int i = 0; i < numIndices; i++)
             build.indices.push_back((GLushort)suIndices[i] + indexOffset);
     }  // for each face
