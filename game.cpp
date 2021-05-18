@@ -96,7 +96,8 @@ int Game::main(const vector<string> args)
             }
         }
         int tick = SDL_GetTicks() - startTick;
-        int deltaTick = tick - prevTick;
+        float time = tick / 1000.0f;
+        float deltaTime = (tick - prevTick) / 1000.0f;
         prevTick = tick;
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -106,7 +107,7 @@ int Game::main(const vector<string> args)
         glm::vec3 flyVec = flyPos + flyNeg;
         if (flyVec != glm::vec3(0)) {
             flyVec = glm::normalize(flyVec);
-            flyVec *= (float)deltaTick * flySpeed / 1000.0f;
+            flyVec *= deltaTime * flySpeed;
         }
         camPos += camTransform.transformVector(flyVec);
         camTransform = Transform::translate(camPos) * camTransform;
