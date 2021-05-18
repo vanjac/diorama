@@ -420,14 +420,12 @@ shared_ptr<Texture> SkpLoader::loadTexture(SUTextureRef suTexture)
     CHECK(SUImageRepCreate(&image));  // uncolorized
     CHECK(SUTextureGetImageRep(suTexture, &image));
 
-    CHECK(SUImageRepConvertTo32BitsPerPixel(image));
-    size_t dataSize, bitsPerPixel;
-    CHECK(SUImageRepGetDataSize(image, &dataSize, &bitsPerPixel));
-    unique_ptr<uint8_t[]> data(new uint8_t[dataSize]);
-    CHECK(SUImageRepGetData(image, dataSize, data.get()));
-
     size_t width, height;
     CHECK(SUImageRepGetPixelDimensions(image, &width, &height));
+
+    unique_ptr<SUColor[]> colors(new SUColor[width * height]);
+    // this is actually much faster than SUImageRepConvertTo32BitsPerPixel
+    CHECK(SUImageRepGetDataAsColors(image, colors.get()));
 
     CHECK(SUImageRepRelease(&image));
 
@@ -437,7 +435,7 @@ shared_ptr<Texture> SkpLoader::loadTexture(SUTextureRef suTexture)
     glBindTexture(GL_TEXTURE_2D, texture->glTexture);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA,
                  width, height, 0,
-                 GL_BGRA, GL_UNSIGNED_BYTE, data.get());
+                 GL_RGBA, GL_UNSIGNED_BYTE, colors.get());
     glGenerateMipmap(GL_TEXTURE_2D);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
