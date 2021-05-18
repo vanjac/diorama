@@ -17,6 +17,5 @@ libraries/gl3w/
 libraries/sketchup/
 libraries/glm/
 
-*.skp
 *.skb
 .vscode/settings.json
