@@ -167,9 +167,11 @@ vec3 Colorize(vec3 color, vec3 delta)
 #endif  // colorize
 
 void main(void)
-{    
+{
+    vec3 normal = normalize(vWorldNormal);
+
 #ifdef DEBUG_NORMALS
-    fColor = vec4((vWorldNormal + 1) / 2, 1);
+    fColor = vec4((normal + 1) / 2, 1);
     return;
 #endif
 
@@ -177,9 +179,9 @@ void main(void)
     fColor = vec4(0.05, 0.05, 0.05, 1);  // should be easily visible
 #endif
 
-    float simpleLight = max(0, dot(vWorldNormal, normalize(vec3(0.5,-1,1))))
+    float simpleLight = max(0, dot(normal, normalize(vec3(0.5,-1,1))))
         * 0.7 + 0.3;
-    vec4 color = vec4(simpleLight);
+    vec4 color = vec4(vec3(simpleLight), 1);
 #ifndef COLORIZE
     color *= BaseColor;
 #endif
