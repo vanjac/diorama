@@ -13,8 +13,7 @@ const int32_t NO_ID = -1;
 
 struct PrimitiveBuilder {
     vector<glm::vec3> vertices, stqCoords, normals;
-    // TODO use short instead of int?
-    vector<GLuint> indices;
+    vector<GLushort> indices;
 };
 
 SkpLoader::SkpLoader(string path, ShaderManager &shaders)
@@ -270,13 +269,13 @@ shared_ptr<Mesh> SkpLoader::loadMesh(SUEntitiesRef entities)
         // constructs if doesn't exist
         PrimitiveBuilder &build = materialPrimitives[materialID];
 
-        GLuint indexOffset = build.vertices.size();
+        GLushort indexOffset = build.vertices.size();
         convertVec3Array(suVertices.get(), numVertices, build.vertices);
         convertVec3Array(suSTQCoords.get(), numVertices, build.stqCoords);
         convertVec3Array(suNormals.get(), numVertices, build.normals);
         build.indices.reserve(build.indices.size() + numIndices);
         for (int i = 0; i < numIndices; i++)
-            build.indices.push_back((GLuint)suIndices[i] + indexOffset);
+            build.indices.push_back((GLushort)suIndices[i] + indexOffset);
     }  // for each face
 
     for (auto &primPair : materialPrimitives) {
@@ -332,7 +331,7 @@ shared_ptr<Mesh> SkpLoader::loadMesh(SUEntitiesRef entities)
         // binding is stored in VAO
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, primitive.elementBuffer);
         glBufferData(GL_ELEMENT_ARRAY_BUFFER,
-                     build.indices.size() * sizeof(GLuint),
+                     build.indices.size() * sizeof(GLushort),
                      &build.indices[0], GL_STATIC_DRAW);
         primitive.numIndices = build.indices.size();
     }  // for each material primitive

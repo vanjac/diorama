@@ -223,7 +223,7 @@ void Game::renderPrimitive(Primitive &primitive, Material *inherit,
     glBindVertexArray(primitive.vertexArray);
     setMaterial(mat, mat == inherit);
     glDrawElements(GL_TRIANGLES, primitive.numIndices,
-                    GL_UNSIGNED_INT, (void *)0);
+                   GL_UNSIGNED_SHORT, (void *)0);
 }
 
 void Game::setMaterial(Material *material, bool inherited)
