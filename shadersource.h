@@ -177,13 +177,13 @@ void main(void)
 
 #ifdef DEBUG_GAMMA
     fColor = vec4(0.05, 0.05, 0.05, 1);  // should be easily visible
+    return;
 #endif
 
-    float simpleLight = max(0, dot(normal, normalize(vec3(0.5,-1,1))))
-        * 0.7 + 0.3;
-    vec4 color = vec4(vec3(simpleLight), 1);
-#ifndef COLORIZE
-    color *= BaseColor;
+#ifdef COLORIZE
+    vec4 color = vec4(1, 1, 1, BaseColor.a);
+#else
+    vec4 color = BaseColor;
 #endif
 #ifdef BASE_TEXTURE
     // perspective warping with homogeneous coordinates
@@ -197,6 +197,9 @@ void main(void)
 #ifdef COLORIZE
     color.rgb = Colorize(color.rgb, BaseColor.rgb);
 #endif
+    float simpleLight = max(0, dot(normal, normalize(vec3(1,-2,3))))
+        * 0.7 + 0.3;
+    color.rgb *= simpleLight;
     fColor = color;
 }
 )X";
