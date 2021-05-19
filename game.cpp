@@ -177,8 +177,8 @@ void Game::keyUp(const SDL_KeyboardEvent &e)
 }
 
 
-void Game::renderHierarchy(Component &component, Material *inherit,
-    bool transparent)
+void Game::renderHierarchy(const Component &component,
+                           const Material *inherit, bool transparent)
 {
     // TODO make this faster, cache values, etc.
     if (component.material)
@@ -212,10 +212,10 @@ void Game::renderHierarchy(Component &component, Material *inherit,
     transform.ModelMatrix = prevModel;
 }
 
-void Game::renderPrimitive(Primitive &primitive, Material *inherit,
-    bool transparent)
+void Game::renderPrimitive(const RenderPrimitive &primitive,
+                           const Material *inherit, bool transparent)
 {
-    Material *mat = primitive.material.get();
+    const Material *mat = primitive.material.get();
     if (!mat)
         mat = inherit;
     if (mat->transparent != transparent)
@@ -227,7 +227,7 @@ void Game::renderPrimitive(Primitive &primitive, Material *inherit,
                    GL_UNSIGNED_SHORT, (void *)0);
 }
 
-void Game::setMaterial(Material *material, bool inherited)
+void Game::setMaterial(const Material *material, bool inherited)
 {
     glUseProgram(material->shader->glProgram);
     setTexture(Material::TEXTURE_BASE, material->texture->glTexture);
