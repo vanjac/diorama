@@ -30,6 +30,8 @@ static optional<CollisionInfo> raycastHierarchy(
     optional<CollisionInfo> closest;
 
     if (component.mesh && !component.mesh->collision.empty()) {
+        // dir may not be a unit vector at this point
+        dir = glm::normalize(dir);  // TODO is this necessary?
         for (auto &primitive : component.mesh->collision) {
             auto collision = raycastPrimitive(primitive, origin, dir);
             if (collision) {
@@ -64,8 +66,6 @@ static optional<CollisionInfo> raycastHierarchy(
 static optional<CollisionInfo> raycastPrimitive(
     const CollisionPrimitive &primitive, glm::vec3 origin, glm::vec3 dir)
 {
-    // dir may not be a unit vector at this point
-    dir = glm::normalize(dir);  // TODO is this necessary?
     for (int i = 0; i < primitive.indices.size(); i += 3) {
         glm::vec3 a = primitive.vertices[primitive.indices[i]];
         glm::vec3 b = primitive.vertices[primitive.indices[i + 1]];

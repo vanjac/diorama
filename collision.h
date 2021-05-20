@@ -8,8 +8,9 @@ namespace diorama::physics {
 struct CollisionInfo
 {
     Component *component;
-    glm::vec3 point;  // calculating distances is problematic, do it yourself
-    glm::vec3 normal;
+    // calculating distances is problematic, do it yourself
+    glm::vec3 point{0, 0, 0};
+    glm::vec3 normal{0, 0, 0};
     // TODO substance
 };
 
