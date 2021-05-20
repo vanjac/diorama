@@ -13,7 +13,7 @@ const int32_t NO_ID = -1;
 
 struct PrimitiveBuilder {
     vector<glm::vec3> vertices, stqCoords, normals;
-    vector<GLushort> indices;
+    vector<MeshIndex> indices;
 };
 
 SkpLoader::SkpLoader(string path, ShaderManager &shaders)
@@ -231,6 +231,8 @@ shared_ptr<Mesh> SkpLoader::loadMesh(SUEntitiesRef entities)
     shared_ptr<Mesh> mesh(new Mesh);
     // maps material ID to builder
     std::unordered_map<int32_t, PrimitiveBuilder> materialPrimitives;
+    mesh->collision.emplace_back();
+    CollisionPrimitive &collision = mesh->collision.back();
 
     for (int i = 0; i < numFaces; i++) {
         SUMeshHelperRef helper = SU_INVALID;
@@ -268,21 +270,27 @@ shared_ptr<Mesh> SkpLoader::loadMesh(SUEntitiesRef entities)
         
         // constructs if doesn't exist
         PrimitiveBuilder &build = materialPrimitives[materialID];
-
-        GLushort indexOffset = build.vertices.size();
+        MeshIndex renderOffset = build.vertices.size();
         convertVec3Array(suVertices.get(), numVertices, build.vertices);
         convertVec3Array(suSTQCoords.get(), numVertices, build.stqCoords);
         convertVec3Array(suNormals.get(), numVertices, build.normals);
-        for (int i = 0; i < numIndices; i++)
-            build.indices.push_back((GLushort)suIndices[i] + indexOffset);
+
+        MeshIndex collisionOffset = collision.vertices.size();
+        convertVec3Array(suVertices.get(), numVertices, collision.vertices);
+
+        for (int i = 0; i < numIndices; i++) {
+            build.indices.push_back((MeshIndex)suIndices[i] + renderOffset);
+            collision.indices.push_back(
+                (MeshIndex)suIndices[i] + collisionOffset);
+        }
     }  // for each face
 
     for (auto &primPair : materialPrimitives) {
         int32_t materialID = primPair.first;
         PrimitiveBuilder &build = primPair.second;
 
-        mesh->primitives.emplace_back();
-        Primitive &primitive = mesh->primitives.back();
+        mesh->render.emplace_back();
+        RenderPrimitive &primitive = mesh->render.back();
 
         if (materialID != NO_ID)
         {
@@ -298,31 +306,31 @@ shared_ptr<Mesh> SkpLoader::loadMesh(SUEntitiesRef entities)
         glBindVertexArray(primitive.vertexArray);
 
         // generate buffers for each vertex attribute
-        glGenBuffers(Primitive::ATTRIB_MAX, primitive.attribBuffers);
+        glGenBuffers(RenderPrimitive::ATTRIB_MAX, primitive.attribBuffers);
 
         size_t vertexBufferSize = build.vertices.size() * sizeof(glm::vec3);
         glBindBuffer(GL_ARRAY_BUFFER,
-                     primitive.attribBuffers[Primitive::ATTRIB_POSITION]);
+                     primitive.attribBuffers[RenderPrimitive::ATTRIB_POSITION]);
         glBufferData(GL_ARRAY_BUFFER, vertexBufferSize,
                      &build.vertices[0], GL_STATIC_DRAW);
-        glVertexAttribPointer(Primitive::ATTRIB_POSITION, 3, GL_FLOAT,
+        glVertexAttribPointer(RenderPrimitive::ATTRIB_POSITION, 3, GL_FLOAT,
                               GL_FALSE, 0, (void *)0);
 
         glBindBuffer(GL_ARRAY_BUFFER,
-                     primitive.attribBuffers[Primitive::ATTRIB_NORMAL]);
+                     primitive.attribBuffers[RenderPrimitive::ATTRIB_NORMAL]);
         glBufferData(GL_ARRAY_BUFFER, vertexBufferSize,
                      &build.normals[0], GL_STATIC_DRAW);
-        glVertexAttribPointer(Primitive::ATTRIB_NORMAL, 3, GL_FLOAT,
+        glVertexAttribPointer(RenderPrimitive::ATTRIB_NORMAL, 3, GL_FLOAT,
                               GL_FALSE, 0, (void *)0);
 
         glBindBuffer(GL_ARRAY_BUFFER,
-                     primitive.attribBuffers[Primitive::ATTRIB_STQ]);
+                     primitive.attribBuffers[RenderPrimitive::ATTRIB_STQ]);
         glBufferData(GL_ARRAY_BUFFER, vertexBufferSize,
                      &build.stqCoords[0], GL_STATIC_DRAW);
-        glVertexAttribPointer(Primitive::ATTRIB_STQ, 3, GL_FLOAT,
+        glVertexAttribPointer(RenderPrimitive::ATTRIB_STQ, 3, GL_FLOAT,
                               GL_FALSE, 0, (void *)0);
 
-        for (int i = 0; i < Primitive::ATTRIB_MAX; i++)
+        for (int i = 0; i < RenderPrimitive::ATTRIB_MAX; i++)
             glEnableVertexAttribArray(i);
 
         // generate buffer for element indices
@@ -330,12 +338,12 @@ shared_ptr<Mesh> SkpLoader::loadMesh(SUEntitiesRef entities)
         // binding is stored in VAO
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, primitive.elementBuffer);
         glBufferData(GL_ELEMENT_ARRAY_BUFFER,
-                     build.indices.size() * sizeof(GLushort),
+                     build.indices.size() * sizeof(MeshIndex),
                      &build.indices[0], GL_STATIC_DRAW);
         primitive.numIndices = build.indices.size();
     }  // for each material primitive
 
-    printf("  %zu primitives\n", mesh->primitives.size());
+    printf("  %zu primitives\n", mesh->render.size());
     return mesh;
 }
 

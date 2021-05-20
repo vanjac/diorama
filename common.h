@@ -4,6 +4,9 @@
 using std::unique_ptr;
 using std::shared_ptr;
 
+#include <optional>
+using std::optional;
+
 #include <string>
 using std::string;
 

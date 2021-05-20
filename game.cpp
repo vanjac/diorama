@@ -185,7 +185,7 @@ void Game::renderHierarchy(const Component &component,
         inherit = component.material.get();
     glm::mat4 prevModel = transform.ModelMatrix;
     transform.ModelMatrix *= component.tLocal().matrix();
-    if (component.mesh) {
+    if (component.mesh && !component.mesh->render.empty()) {
         glm::mat3 model3 = transform.ModelMatrix;
         transform.NormalMatrix = glm::transpose(glm::inverse(model3));
         // detect negative scale https://gamedev.stackexchange.com/a/54508
@@ -199,7 +199,7 @@ void Game::renderHierarchy(const Component &component,
         glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(TransformBlock),
                         &transform);
 
-        for (auto &primitive : component.mesh->primitives) {
+        for (auto &primitive : component.mesh->render) {
             renderPrimitive(primitive, inherit, transparent);
         }
 

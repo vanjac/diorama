@@ -1,0 +1,107 @@
+#include "collision.h"
+#include <glm/gtx/norm.hpp>
+#include <limits>
+
+namespace diorama::physics {
+
+static optional<CollisionInfo> raycastHierarchy(
+    Component &component, glm::vec3 origin, glm::vec3 dir);
+static optional<CollisionInfo> raycastPrimitive(
+    const CollisionPrimitive &primitive, glm::vec3 origin, glm::vec3 dir);
+
+optional<CollisionInfo> raycast(const World &world,
+                                glm::vec3 origin, glm::vec3 dir)
+{
+    auto collision = raycastHierarchy(*world.root(), origin, dir);
+    if (collision)
+        collision->normal = glm::normalize(collision->normal);
+    return collision;
+}
+
+static optional<CollisionInfo> raycastHierarchy(
+    Component &component, glm::vec3 origin, glm::vec3 dir)
+{
+    const Transform &t = component.tLocal();
+    Transform invT = t.inverse();
+    origin = invT.transformPoint(origin);
+    dir = invT.transformVector(dir);  // TODO preserve length
+
+    float closestDist2 = std::numeric_limits<float>::max();
+    optional<CollisionInfo> closest;
+
+    if (component.mesh && !component.mesh->collision.empty()) {
+        for (auto &primitive : component.mesh->collision) {
+            auto collision = raycastPrimitive(primitive, origin, dir);
+            if (collision) {
+                float dist2 = glm::distance2(origin, collision->point);
+                if (dist2 < closestDist2) {
+                    closestDist2 = dist2;
+                    closest = collision;
+                    closest->component = &component;
+                }
+            }
+        }
+    }
+    for (auto &child : component.children()) {
+        auto collision = raycastHierarchy(*child, origin, dir);
+        if (collision) {
+            float dist2 = glm::distance2(origin, collision->point);
+            if (dist2 < closestDist2) {
+                closestDist2 = dist2;
+                closest = collision;
+            }
+        }
+    }
+
+    if (closest) {
+        closest->point = t.transformPoint(closest->point);
+        closest->normal = t.transformVector(closest->normal);
+        return closest;
+    }
+    return std::nullopt;
+}
+
+static optional<CollisionInfo> raycastPrimitive(
+    const CollisionPrimitive &primitive, glm::vec3 origin, glm::vec3 dir)
+{
+    // dir may not be a unit vector at this point
+    dir = glm::normalize(dir);  // TODO is this necessary?
+    for (int i = 0; i < primitive.indices.size(); i += 3) {
+        glm::vec3 a = primitive.vertices[primitive.indices[i]];
+        glm::vec3 b = primitive.vertices[primitive.indices[i + 1]];
+        glm::vec3 c = primitive.vertices[primitive.indices[i + 2]];
+
+        // triangle plane normal and coefficient
+        glm::vec3 triCross = glm::cross(b - a, c - a);
+        glm::vec3 planeNormal = glm::normalize(triCross);  // TODO avoid?
+        float planeK = glm::dot(planeNormal, a);
+
+        // intersect ray with plane
+        float nDotD = glm::dot(planeNormal, dir);
+        if (nDotD > -1e-6)
+            continue;  // only front facing
+        float t = (planeK - glm::dot(planeNormal, origin)) / nDotD;
+        if (t <= 0)
+            continue;
+        glm::vec3 intersect = origin + dir * t;
+
+        // double-area of smaller triangles defined by intersection point
+        float dAreaQBC = glm::dot(glm::cross(c - b, intersect - b), planeNormal);
+        float dAreaAQC = glm::dot(glm::cross(a - c, intersect - c), planeNormal);
+        float dAreaABQ = glm::dot(glm::cross(b - a, intersect - a), planeNormal);
+
+        // inside triangle?
+        // check if inside all the edges
+        if (dAreaQBC < 0 || dAreaAQC < 0 || dAreaABQ < 0)
+            continue;  // not inside triangle
+
+        CollisionInfo collision;
+        collision.point = intersect;
+        collision.normal = planeNormal;
+        return collision;
+    }
+    return std::nullopt;
+}
+
+
+}  // namespace

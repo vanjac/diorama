@@ -6,7 +6,9 @@
 
 namespace diorama {
 
-struct Primitive
+using MeshIndex = uint16_t;
+
+struct RenderPrimitive
 {
     enum VertexAttributes
     {
@@ -21,9 +23,17 @@ struct Primitive
     shared_ptr<Material> material;  // null for default material
 };
 
+struct CollisionPrimitive
+{
+    vector<glm::vec3> vertices;
+    vector<MeshIndex> indices;  // triangles
+    // TODO substance
+};
+
 struct Mesh
 {
-    vector<Primitive> primitives;
+    vector<RenderPrimitive> render;
+    vector<CollisionPrimitive> collision;
     // TODO edges
     // TODO bounds
 };
