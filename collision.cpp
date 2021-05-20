@@ -67,6 +67,9 @@ static optional<CollisionInfo> raycastHierarchy(
 static optional<CollisionInfo> raycastPrimitive(
     const CollisionPrimitive &primitive, glm::vec3 origin, glm::vec3 dir)
 {
+    float closestDist = std::numeric_limits<float>::max();
+    optional<CollisionInfo> closest;
+
     for (int i = 0; i < primitive.indices.size(); i += 3) {
         glm::vec3 a = primitive.vertices[primitive.indices[i]];
         glm::vec3 b = primitive.vertices[primitive.indices[i + 1]];
@@ -82,7 +85,7 @@ static optional<CollisionInfo> raycastPrimitive(
         if (nDotD > -1e-6)
             continue;  // only front facing
         float t = (planeK - glm::dot(planeNormal, origin)) / nDotD;
-        if (t <= 0)
+        if (t <= 0 || t > closestDist)
             continue;
         glm::vec3 intersect = origin + dir * t;
 
@@ -96,12 +99,12 @@ static optional<CollisionInfo> raycastPrimitive(
         if (dAreaQBC < 0 || dAreaAQC < 0 || dAreaABQ < 0)
             continue;  // not inside triangle
 
-        CollisionInfo collision;
-        collision.point = intersect;
-        collision.normal = planeNormal;
-        return collision;
+        closest = CollisionInfo();
+        closest->point = intersect;
+        closest->normal = planeNormal;
+        closestDist = t;
     }
-    return std::nullopt;
+    return closest;
 }
 
 
