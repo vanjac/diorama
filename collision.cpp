@@ -57,7 +57,8 @@ static optional<CollisionInfo> raycastHierarchy(
 
     if (closest) {
         closest->point = t.transformPoint(closest->point);
-        closest->normal = t.transformVector(closest->normal);
+        closest->normal = glm::transpose(glm::mat3(invT.matrix()))
+            * closest->normal;
         return closest;
     }
     return std::nullopt;
