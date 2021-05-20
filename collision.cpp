@@ -7,7 +7,8 @@ namespace diorama::physics {
 static optional<CollisionInfo> raycastHierarchy(
     Component &component, glm::vec3 origin, glm::vec3 dir);
 static optional<CollisionInfo> raycastPrimitive(
-    const CollisionPrimitive &primitive, glm::vec3 origin, glm::vec3 dir);
+    const CollisionPrimitive &primitive, glm::vec3 origin, glm::vec3 dir,
+    float *closestDist2);
 
 optional<CollisionInfo> raycast(const World &world,
                                 glm::vec3 origin, glm::vec3 dir)
@@ -33,14 +34,11 @@ static optional<CollisionInfo> raycastHierarchy(
         // dir may not be a unit vector at this point
         dir = glm::normalize(dir);  // TODO is this necessary?
         for (auto &primitive : component.mesh->collision) {
-            auto collision = raycastPrimitive(primitive, origin, dir);
+            auto collision = raycastPrimitive(primitive, origin, dir,
+                                              &closestDist2);
             if (collision) {
-                float dist2 = glm::distance2(origin, collision->point);
-                if (dist2 < closestDist2) {
-                    closestDist2 = dist2;
-                    closest = collision;
-                    closest->component = &component;
-                }
+                closest = collision;
+                closest->component = &component;
             }
         }
     }
@@ -65,9 +63,9 @@ static optional<CollisionInfo> raycastHierarchy(
 }
 
 static optional<CollisionInfo> raycastPrimitive(
-    const CollisionPrimitive &primitive, glm::vec3 origin, glm::vec3 dir)
+    const CollisionPrimitive &primitive, glm::vec3 origin, glm::vec3 dir,
+    float *closestDist2)
 {
-    float closestDist = std::numeric_limits<float>::max();
     optional<CollisionInfo> closest;
 
     for (int i = 0; i < primitive.indices.size(); i += 3) {
@@ -85,7 +83,7 @@ static optional<CollisionInfo> raycastPrimitive(
         if (nDotD > -1e-6)
             continue;  // only front facing
         float t = (planeK - glm::dot(planeNormal, origin)) / nDotD;
-        if (t <= 0 || t > closestDist)
+        if (t <= 0 || t*t > *closestDist2)
             continue;
         glm::vec3 intersect = origin + dir * t;
 
@@ -102,7 +100,7 @@ static optional<CollisionInfo> raycastPrimitive(
         closest = CollisionInfo();
         closest->point = intersect;
         closest->normal = planeNormal;
-        closestDist = t;
+        *closestDist2 = t*t;
     }
     return closest;
 }
