@@ -11,10 +11,10 @@ namespace diorama {
 // TODO: split off Model and Normal?
 struct TransformBlock
 {
-    glm::mat4 ModelMatrix;
-    glm::mat4 NormalMatrix;  // actually mat3
-    glm::mat4 ViewMatrix;
-    glm::mat4 ProjectionMatrix;
+    glm::mat4 ModelMatrix {1};
+    glm::mat4 NormalMatrix {1};  // actually mat3
+    glm::mat4 ViewMatrix {1};
+    glm::mat4 ProjectionMatrix {1};
 };
 
 struct ShaderProgram

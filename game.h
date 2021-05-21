@@ -20,12 +20,13 @@ private:
     void keyDown(const SDL_KeyboardEvent &e);
     void keyUp(const SDL_KeyboardEvent &e);
 
-    void Game::renderHierarchy(const Component &component,
+    void renderHierarchy(const Component &component,
         const Material *inherit, bool transparent);
-    void Game::renderPrimitive(const RenderPrimitive &primitive,
+    void renderPrimitive(const RenderPrimitive &primitive,
         const Material *inherit, bool transparent);
-    void Game::setMaterial(const Material *material, bool inherited);
-    void Game::setTexture(int unit, GLTexture texture);
+    void setTransform(const TransformBlock &block);
+    void setMaterial(const Material *material, bool inherited);
+    void setTexture(int unit, GLTexture texture);
 
     SDL_Window *window;
     World world;

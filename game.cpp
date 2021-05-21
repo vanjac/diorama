@@ -195,9 +195,7 @@ void Game::renderHierarchy(const Component &component,
             glCullFace(GL_FRONT);
 
         // TODO bad to update for every component?
-        glBindBuffer(GL_UNIFORM_BUFFER, transformUBO);
-        glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(TransformBlock),
-                        &transform);
+        setTransform(transform);
 
         for (auto &primitive : component.mesh->render) {
             renderPrimitive(primitive, inherit, transparent);
@@ -225,6 +223,13 @@ void Game::renderPrimitive(const RenderPrimitive &primitive,
     setMaterial(mat, mat == inherit);
     glDrawElements(GL_TRIANGLES, primitive.numIndices,
                    GL_UNSIGNED_SHORT, (void *)0);
+}
+
+void Game::setTransform(const TransformBlock &block)
+{
+    glBindBuffer(GL_UNIFORM_BUFFER, transformUBO);
+    glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(TransformBlock),
+                    &block);
 }
 
 void Game::setMaterial(const Material *material, bool inherited)
