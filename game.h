@@ -28,6 +28,8 @@ private:
     void setMaterial(const Material *material, bool inherited);
     void setTexture(int unit, GLTexture texture);
 
+    void debugLine(glm::vec3 start, glm::vec3 end, glm::vec3 color);
+
     SDL_Window *window;
     World world;
     bool running = true;
@@ -37,6 +39,9 @@ private:
 
     TransformBlock transform;
     GLBuffer transformUBO;  // shared between all programs
+
+    GLVertexArray debugVertexArray;
+    GLBuffer debugVertexBuffer;
 
     float camYaw = 0, camPitch = 0;
     glm::vec3 camPos{0, 0, 0};

@@ -64,6 +64,16 @@ int Game::main(const vector<string> args)
         world.setRoot(loader.loadRoot());
     }
 
+    glGenVertexArrays(1, &debugVertexArray);
+    glBindVertexArray(debugVertexArray);
+    glGenBuffers(1, &debugVertexBuffer);
+    glBindBuffer(GL_ARRAY_BUFFER, debugVertexBuffer);
+    glm::vec3 initVertices[2] { {0,0,0}, {0,0,0} };
+    glBufferData(GL_ARRAY_BUFFER, sizeof(initVertices), initVertices,
+                 GL_STREAM_DRAW);
+    glVertexAttribPointer(RenderPrimitive::ATTRIB_POSITION, 3, GL_FLOAT,
+                          GL_FALSE, 0, (void *)0);
+    glEnableVertexAttribArray(RenderPrimitive::ATTRIB_POSITION);
 
     int startTick = SDL_GetTicks();
     int prevTick = 0;
@@ -247,6 +257,20 @@ void Game::setTexture(int unit, GLTexture texture)
 {
     glActiveTexture(GL_TEXTURE0 + unit);
     glBindTexture(GL_TEXTURE_2D, texture);
+}
+
+void Game::debugLine(glm::vec3 start, glm::vec3 end, glm::vec3 color)
+{
+    glm::vec3 data[2] {start, end};
+    glBindVertexArray(debugVertexArray);
+    glBindBuffer(GL_ARRAY_BUFFER, debugVertexBuffer);
+    glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(data), data);
+
+    glUseProgram(shaders.debugProg->glProgram);
+    glm::vec4 color4(color, 1);
+    glUniform4fv(shaders.debugProg->baseColorLoc, 1, glm::value_ptr(color4));
+
+    glDrawArrays(GL_LINES, 0, 2);
 }
 
 }  // namespace

@@ -38,6 +38,17 @@ void main()
 }
 )X";
 
+const string debugFragShaderSrc = R"X(
+out vec4 fColor;
+
+uniform vec4 BaseColor;
+
+void main(void)
+{
+    fColor = BaseColor;
+}
+)X";
+
 const string fragShaderSrc = R"X(
 in vec3 vWorldPosition;
 in vec3 vWorldNormal;

@@ -36,6 +36,7 @@ public:
 
     shared_ptr<ShaderProgram> coloredProg, texturedProg,
         shiftedTextureProg, tintedTextureProg;
+    shared_ptr<ShaderProgram> debugProg;
 
 private:
     GLShader compileShader(GLType type, string name,

@@ -26,6 +26,8 @@ void ShaderManager::init()
         {VERSION_DIRECTIVE,
         "#define BASE_TEXTURE\n#define COLORIZE_TINT\n",
         fragShaderSrc});
+    GLShader debugFrag = compileShader(GL_FRAGMENT_SHADER, "Fragment",
+        {VERSION_DIRECTIVE, debugFragShaderSrc});
 
     coloredProg = std::make_shared<ShaderProgram>();
     coloredProg->glProgram = linkProgram("Program", {basicVert, coloredFrag});
@@ -45,10 +47,15 @@ void ShaderManager::init()
         {basicVert, tintedTextureFrag});
     setProgramBindings(*tintedTextureProg);
 
+    debugProg = std::make_shared<ShaderProgram>();
+    debugProg->glProgram = linkProgram("Program", {basicVert, debugFrag});
+    setProgramBindings(*debugProg);
+
     glDeleteShader(coloredFrag);
     glDeleteShader(texturedFrag);
     glDeleteShader(shiftedTextureFrag);
     glDeleteShader(tintedTextureFrag);
+    glDeleteShader(debugFrag);
 }
 
 GLShader ShaderManager::compileShader(GLType type, string name,
