@@ -31,6 +31,16 @@ static optional<CollisionInfo> raycastHierarchy(
     float closestDist2 = std::numeric_limits<float>::max();
     optional<CollisionInfo> closest;
 
+    for (auto &child : component.children()) {
+        auto collision = raycastHierarchy(*child, origin, dir);
+        if (collision) {
+            float dist2 = glm::distance2(origin, collision->point);
+            if (dist2 < closestDist2) {
+                closestDist2 = dist2;
+                closest = collision;
+            }
+        }
+    }
     if (component.mesh && !component.mesh->collision.empty()) {
         // dir may not be a unit vector at this point
         dir = glm::normalize(dir);
@@ -40,16 +50,6 @@ static optional<CollisionInfo> raycastHierarchy(
             if (collision) {
                 closest = collision;
                 closest->component = &component;
-            }
-        }
-    }
-    for (auto &child : component.children()) {
-        auto collision = raycastHierarchy(*child, origin, dir);
-        if (collision) {
-            float dist2 = glm::distance2(origin, collision->point);
-            if (dist2 < closestDist2) {
-                closestDist2 = dist2;
-                closest = collision;
             }
         }
     }
