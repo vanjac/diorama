@@ -6,6 +6,7 @@ namespace diorama::physics {
 
 static optional<CollisionInfo> raycastHierarchy(
     Component &component, glm::vec3 origin, glm::vec3 dir);
+// dir must be a unit vector
 static optional<CollisionInfo> raycastPrimitive(
     const CollisionPrimitive &primitive, glm::vec3 origin, glm::vec3 dir,
     float *closestDist2);
@@ -32,7 +33,7 @@ static optional<CollisionInfo> raycastHierarchy(
 
     if (component.mesh && !component.mesh->collision.empty()) {
         // dir may not be a unit vector at this point
-        dir = glm::normalize(dir);  // TODO is this necessary?
+        dir = glm::normalize(dir);
         for (auto &primitive : component.mesh->collision) {
             auto collision = raycastPrimitive(primitive, origin, dir,
                                               &closestDist2);
@@ -75,6 +76,8 @@ static optional<CollisionInfo> raycastPrimitive(
 
         // triangle plane normal and coefficient
         glm::vec3 triCross = glm::cross(b - a, c - a);
+        if (triCross == glm::vec3(0))  // happens with some geometry idk
+            continue;
         glm::vec3 planeNormal = glm::normalize(triCross);  // TODO avoid?
         float planeK = glm::dot(planeNormal, a);
 
