@@ -2,7 +2,6 @@
 #include "common.h"
 
 #include <SketchUpAPI/sketchup.h>
-#include <unordered_map>
 #include "mesh.h"
 #include "material.h"
 #include "component.h"
@@ -54,14 +53,14 @@ private:
     // maps file name to texture
     // file name seems to be the only way to identify shared ImageReps, but this
     // can cause conflicts
-    std::unordered_map<string, Texture *> loadedTextures;
+    unordered_map<string, Texture *> loadedTextures;
     // maps SU material ID to material (not persistent ID!)
-    std::unordered_map<int32_t, Material *> loadedMaterials;
+    unordered_map<int32_t, Material *> loadedMaterials;
     // maps SU definition ID to component hierarchy
-    std::unordered_map<int32_t, unique_ptr<Component>> componentDefinitions;
+    unordered_map<int32_t, unique_ptr<Component>> componentDefinitions;
     // maps image instance ID to ComponentInstance
     // because we can't cast Image to ComponentInstance for some reason :(
-    std::unordered_map<int32_t, SUComponentInstanceRef> imageInstances;
+    unordered_map<int32_t, SUComponentInstanceRef> imageInstances;
 };
 
 }  // namespace
