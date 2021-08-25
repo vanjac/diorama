@@ -22,7 +22,6 @@ const glm::mat4 REMAP_AXES(
 
 Game::Game(SDL_Window *window)
     : window(window)
-    , defaultMaterial(new Material)
 {}
 
 int Game::main(const vector<string> args)
@@ -54,12 +53,15 @@ int Game::main(const vector<string> args)
     glBindBufferBase(GL_UNIFORM_BUFFER,
         ShaderProgram::BIND_TRANSFORM, transformUBO);
 
-    shaders.init();
+    shaders.init(world);
+
+    defaultMaterial = new Material;
+    world.addResource(defaultMaterial);
     defaultMaterial->shader = shaders.coloredProg;
-    defaultMaterial->texture = Texture::NO_TEXTURE;
+    defaultMaterial->texture = shaders.noTexture;
 
     {
-        SkpLoader loader(path, shaders);
+        SkpLoader loader(path, world, shaders);
         loader.loadGlobal();
         world.setRoot(loader.loadRoot());
     }
@@ -125,11 +127,11 @@ int Game::main(const vector<string> args)
         transform.ViewMatrix = camTransform.inverse().matrix();
 
         transform.ModelMatrix = glm::mat4(1);
-        renderHierarchy(*world.root(), defaultMaterial.get(), false);
+        renderHierarchy(*world.root(), defaultMaterial, false);
         glEnable(GL_BLEND);
         glDepthMask(GL_FALSE);
         transform.ModelMatrix = glm::mat4(1);
-        renderHierarchy(*world.root(), defaultMaterial.get(), true);
+        renderHierarchy(*world.root(), defaultMaterial, true);
         glDisable(GL_BLEND);
         glDepthMask(GL_TRUE);
 
@@ -192,7 +194,7 @@ void Game::renderHierarchy(const Component &component,
 {
     // TODO make this faster, cache values, etc.
     if (component.material)
-        inherit = component.material.get();
+        inherit = component.material;
     glm::mat4 prevModel = transform.ModelMatrix;
     transform.ModelMatrix *= component.tLocal().matrix();
     if (component.mesh && !component.mesh->render.empty()) {
@@ -223,7 +225,7 @@ void Game::renderHierarchy(const Component &component,
 void Game::renderPrimitive(const RenderPrimitive &primitive,
                            const Material *inherit, bool transparent)
 {
-    const Material *mat = primitive.material.get();
+    const Material *mat = primitive.material;
     if (!mat)
         mat = inherit;
     if (mat->transparent != transparent)

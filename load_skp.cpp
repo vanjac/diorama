@@ -16,8 +16,9 @@ struct PrimitiveBuilder {
     vector<MeshIndex> indices;
 };
 
-SkpLoader::SkpLoader(string path, ShaderManager &shaders)
-    : shaders(shaders)
+SkpLoader::SkpLoader(string path, World &world, ShaderManager &shaders)
+    : world(world)
+    , shaders(shaders)
 {
     printf("Loading from %s\n", path.c_str());
     SUInitialize();
@@ -219,7 +220,7 @@ shared_ptr<Component> SkpLoader::loadInstance(SUComponentInstanceRef instance)
     return component;
 }
 
-shared_ptr<Mesh> SkpLoader::loadMesh(SUEntitiesRef entities)
+Mesh * SkpLoader::loadMesh(SUEntitiesRef entities)
 {
     size_t numFaces;
     CHECK(SUEntitiesGetNumFaces(entities, &numFaces));
@@ -228,7 +229,9 @@ shared_ptr<Mesh> SkpLoader::loadMesh(SUEntitiesRef entities)
     unique_ptr<SUFaceRef[]> faces(new SUFaceRef[numFaces]);
     CHECK(SUEntitiesGetFaces(entities, numFaces, faces.get(), &numFaces));
 
-    shared_ptr<Mesh> mesh(new Mesh);
+    Mesh * mesh = new Mesh;
+    world.addResource(mesh);
+
     // maps material ID to builder
     std::unordered_map<int32_t, PrimitiveBuilder> materialPrimitives;
     mesh->collision.emplace_back();
@@ -347,7 +350,7 @@ shared_ptr<Mesh> SkpLoader::loadMesh(SUEntitiesRef entities)
     return mesh;
 }
 
-shared_ptr<Material> SkpLoader::loadMaterial(SUMaterialRef suMaterial)
+Material * SkpLoader::loadMaterial(SUMaterialRef suMaterial)
 {
     SUStringRef nameStr = createString();
     CHECK(SUMaterialGetName(suMaterial, &nameStr));
@@ -355,7 +358,8 @@ shared_ptr<Material> SkpLoader::loadMaterial(SUMaterialRef suMaterial)
     printf("Material %d: %s\n", getID(SUMaterialToEntity(suMaterial)),
         name.c_str());
 
-    shared_ptr<Material> material(new Material);
+    Material * material = new Material;
+    world.addResource(material);
 
     CHECK(SUMaterialIsDrawnTransparent(suMaterial, &material->transparent));
     if (material->transparent)
@@ -369,7 +373,7 @@ shared_ptr<Material> SkpLoader::loadMaterial(SUMaterialRef suMaterial)
         CHECK(SUMaterialGetColor(suMaterial, &color));
         material->shader = shaders.coloredProg;
         material->color = colorToVec(color);
-        material->texture = Texture::NO_TEXTURE;
+        material->texture = shaders.noTexture;
         printf("  Solid color %f %f %f %f\n",
             material->color.r, material->color.g, material->color.b,
             material->color.a);
@@ -411,7 +415,7 @@ shared_ptr<Material> SkpLoader::loadMaterial(SUMaterialRef suMaterial)
 }
 
 
-shared_ptr<Texture> SkpLoader::loadTexture(SUTextureRef suTexture)
+Texture * SkpLoader::loadTexture(SUTextureRef suTexture)
 {
     SUStringRef fileNameStr = createString();
     CHECK(SUTextureGetFileName(suTexture, &fileNameStr));
@@ -437,7 +441,8 @@ shared_ptr<Texture> SkpLoader::loadTexture(SUTextureRef suTexture)
 
     CHECK(SUImageRepRelease(&image));
 
-    shared_ptr<Texture> texture(new Texture);
+    Texture * texture(new Texture);
+    world.addResource(texture);
 
     glGenTextures(1, &texture->glTexture);
     glBindTexture(GL_TEXTURE_2D, texture->glTexture);

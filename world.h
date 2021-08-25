@@ -8,6 +8,9 @@ namespace diorama {
 
 class World {
 public:
+    // takes ownership
+    void addResource(Resource *resource);
+
     shared_ptr<Component> root() const;
     void setRoot(shared_ptr<Component> root);
 
@@ -36,6 +39,8 @@ public:
 private:
     void addComponent(Component *component);
     void removeComponent(Component *component);
+
+    vector<unique_ptr<Resource>> _resources;
 
     shared_ptr<Component> _root;
 

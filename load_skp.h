@@ -6,13 +6,14 @@
 #include "mesh.h"
 #include "material.h"
 #include "component.h"
+#include "world.h"
 
 namespace diorama {
 
 class SkpLoader
 {
 public:
-    SkpLoader(string path, ShaderManager &shaders);
+    SkpLoader(string path, World &world, ShaderManager &shaders);
     ~SkpLoader();
 
     // call before loading anything else
@@ -24,9 +25,9 @@ private:
     // return null for no mesh
     void loadEntities(SUEntitiesRef entities, Component &component);
     shared_ptr<Component> loadInstance(SUComponentInstanceRef instance);
-    shared_ptr<Mesh> loadMesh(SUEntitiesRef entities);
-    shared_ptr<Material> loadMaterial(SUMaterialRef suMaterial);
-    shared_ptr<Texture> loadTexture(SUTextureRef suTexture);
+    Mesh * loadMesh(SUEntitiesRef entities);
+    Material * loadMaterial(SUMaterialRef suMaterial);
+    Texture * loadTexture(SUTextureRef suTexture);
 
     // utils
     int32_t getID(SUEntityRef entity);
@@ -48,14 +49,15 @@ private:
     }
 
     SUModelRef model = SU_INVALID;
+    World &world;
     ShaderManager &shaders;
 
     // maps file name to texture
     // file name seems to be the only way to identify shared ImageReps, but this
     // can cause conflicts
-    std::unordered_map<string, shared_ptr<Texture>> loadedTextures;
+    std::unordered_map<string, Texture *> loadedTextures;
     // maps SU material ID to material (not persistent ID!)
-    std::unordered_map<int32_t, shared_ptr<Material>> loadedMaterials;
+    std::unordered_map<int32_t, Material *> loadedMaterials;
     // maps SU definition ID to component hierarchy
     std::unordered_map<int32_t, shared_ptr<Component>> componentDefinitions;
     // maps image instance ID to ComponentInstance

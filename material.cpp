@@ -2,14 +2,15 @@
 #include "shadersource.h"
 #include <exception>
 #include <GL/gl3w.h>
+#include "world.h"
 
 namespace diorama {
 
-const shared_ptr<Texture> Texture::NO_TEXTURE(new Texture);
-
-
-void ShaderManager::init()
+void ShaderManager::init(World &world)
 {
+    noTexture = new Texture;
+    world.addResource(noTexture);
+
     basicVert = compileShader(GL_VERTEX_SHADER, "Vertex",
         {VERSION_DIRECTIVE, vertShaderSrc});
     GLShader coloredFrag = compileShader(GL_FRAGMENT_SHADER, "Fragment",
@@ -29,25 +30,30 @@ void ShaderManager::init()
     GLShader debugFrag = compileShader(GL_FRAGMENT_SHADER, "Fragment",
         {VERSION_DIRECTIVE, debugFragShaderSrc});
 
-    coloredProg = std::make_shared<ShaderProgram>();
+    coloredProg = new ShaderProgram;
+    world.addResource(coloredProg);
     coloredProg->glProgram = linkProgram("Program", {basicVert, coloredFrag});
     setProgramBindings(*coloredProg);
 
-    texturedProg = std::make_shared<ShaderProgram>();
+    texturedProg = new ShaderProgram;
+    world.addResource(texturedProg);
     texturedProg->glProgram = linkProgram("Program", {basicVert, texturedFrag});
     setProgramBindings(*texturedProg);
 
-    shiftedTextureProg = std::make_shared<ShaderProgram>();
+    shiftedTextureProg = new ShaderProgram;
+    world.addResource(shiftedTextureProg);
     shiftedTextureProg->glProgram = linkProgram("Program",
         {basicVert, shiftedTextureFrag});
     setProgramBindings(*shiftedTextureProg);
 
-    tintedTextureProg = std::make_shared<ShaderProgram>();
+    tintedTextureProg = new ShaderProgram;
+    world.addResource(tintedTextureProg);
     tintedTextureProg->glProgram = linkProgram("Program",
         {basicVert, tintedTextureFrag});
     setProgramBindings(*tintedTextureProg);
 
-    debugProg = std::make_shared<ShaderProgram>();
+    debugProg = new ShaderProgram;
+    world.addResource(debugProg);
     debugProg->glProgram = linkProgram("Program", {basicVert, debugFrag});
     setProgramBindings(*debugProg);
 

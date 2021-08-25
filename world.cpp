@@ -2,6 +2,11 @@
 
 namespace diorama {
 
+void World::addResource(Resource *resource)
+{
+    _resources.emplace_back(resource);
+}
+
 shared_ptr<Component> World::root() const
 {
     return _root;

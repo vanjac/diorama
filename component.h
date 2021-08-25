@@ -21,9 +21,9 @@ public:
     Component & operator=(const Component &rhs);
 
     string name;  // shouldn't change after adding to world
-    shared_ptr<Mesh> mesh;  // could be null
+    Mesh *mesh = nullptr;  // could be null
     // overrides defaults in mesh and children. null for default
-    shared_ptr<Material> material;
+    Material *material = nullptr;
 
     const Transform & tLocal() const;
     Transform & tLocalMut();

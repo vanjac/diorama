@@ -2,10 +2,13 @@
 #include "common.h"
 
 #include "glutils.h"
+#include "resource.h"
 #include <initializer_list>
 #include <glm/glm.hpp>
 
 namespace diorama {
+
+class World;
 
 // matches interface block in shader
 // TODO: split off Model and Normal?
@@ -17,7 +20,7 @@ struct TransformBlock
     glm::mat4 ProjectionMatrix {1};
 };
 
-struct ShaderProgram
+struct ShaderProgram : Resource
 {
     enum BufferBindingPoints
     {
@@ -29,14 +32,23 @@ struct ShaderProgram
     GLUniformLocation textureScaleLoc = -1;
 };
 
+struct Texture : Resource
+{
+    GLTexture glTexture = 0;
+};
+
 class ShaderManager
 {
 public:
-    void init();
+    void init(World &world);
 
-    shared_ptr<ShaderProgram> coloredProg, texturedProg,
-        shiftedTextureProg, tintedTextureProg;
-    shared_ptr<ShaderProgram> debugProg;
+    Texture *noTexture = nullptr;
+
+    ShaderProgram *coloredProg = nullptr;
+    ShaderProgram *texturedProg = nullptr;
+    ShaderProgram *shiftedTextureProg = nullptr;
+    ShaderProgram *tintedTextureProg = nullptr;
+    ShaderProgram *debugProg = nullptr;
 
 private:
     GLShader compileShader(GLType type, string name,
@@ -47,24 +59,16 @@ private:
     GLShader basicVert = 0;
 };
 
-
-struct Texture
-{
-    static const shared_ptr<Texture> NO_TEXTURE;
-
-    GLTexture glTexture = 0;
-};
-
-struct Material
+struct Material : Resource
 {
     enum TextureUnits
     {
         TEXTURE_BASE
     };
 
-    shared_ptr<ShaderProgram> shader;  // never null
+    const ShaderProgram *shader = nullptr;  // never null
     bool transparent = false;
-    shared_ptr<Texture> texture;  // never null
+    const Texture *texture = nullptr;  // never null
     glm::vec4 color {1, 1, 1, 1};
 // https://extensions.sketchup.com/developers/sketchup_c_api/sketchup/struct_s_u_texture_ref.html#ac9341c5de53bcc1a89e51de463bd54a0
     glm::vec2 scale {1, 1};

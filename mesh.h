@@ -2,6 +2,7 @@
 #include "common.h"
 
 #include "glutils.h"
+#include "resource.h"
 #include "material.h"
 
 namespace diorama {
@@ -20,7 +21,7 @@ struct RenderPrimitive
     GLBuffer elementBuffer = 0;
     int numIndices = 0;
 
-    shared_ptr<Material> material;  // null for default material
+    Material *material = nullptr;  // null for default material
 };
 
 struct CollisionPrimitive
@@ -30,7 +31,7 @@ struct CollisionPrimitive
     // TODO substance
 };
 
-struct Mesh
+struct Mesh : Resource
 {
     vector<RenderPrimitive> render;
     vector<CollisionPrimitive> collision;
