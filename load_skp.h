@@ -18,13 +18,12 @@ public:
 
     // call before loading anything else
     void loadGlobal();
-    // return null for no mesh
-    shared_ptr<Component> loadRoot();
+    Component * loadRoot();
 
 private:
     // return null for no mesh
     void loadEntities(SUEntitiesRef entities, Component &component);
-    shared_ptr<Component> loadInstance(SUComponentInstanceRef instance);
+    Component * loadInstance(SUComponentInstanceRef instance);
     Mesh * loadMesh(SUEntitiesRef entities);
     Material * loadMaterial(SUMaterialRef suMaterial);
     Texture * loadTexture(SUTextureRef suTexture);
@@ -59,7 +58,7 @@ private:
     // maps SU material ID to material (not persistent ID!)
     std::unordered_map<int32_t, Material *> loadedMaterials;
     // maps SU definition ID to component hierarchy
-    std::unordered_map<int32_t, shared_ptr<Component>> componentDefinitions;
+    std::unordered_map<int32_t, unique_ptr<Component>> componentDefinitions;
     // maps image instance ID to ComponentInstance
     // because we can't cast Image to ComponentInstance for some reason :(
     std::unordered_map<int32_t, SUComponentInstanceRef> imageInstances;

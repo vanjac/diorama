@@ -7,19 +7,19 @@ void World::addResource(Resource *resource)
     _resources.emplace_back(resource);
 }
 
-shared_ptr<Component> World::root() const
+Component * World::root() const
 {
-    return _root;
+    return _root.get();
 }
 
-void World::setRoot(shared_ptr<Component> root)
+void World::setRoot(Component *root)
 {
-    if (_root == root)
+    if (_root.get() == root)
         return;
     if (_root) {
         _root->setWorld(nullptr);
     }
-    _root = root;
+    _root = unique_ptr<Component>(root);
     if (root) {
         _root->setWorld(this);
     }
@@ -44,7 +44,7 @@ void World::addHierarchy(Component *component)
 {
     addComponent(component);
     for (auto &child : component->children()) {
-        addHierarchy(child.get());
+        addHierarchy(child);
     }
 }
 
@@ -52,7 +52,7 @@ void World::removeHierarchy(Component *component)
 {
     removeComponent(component);
     for (auto &child : component->children()) {
-        removeHierarchy(child.get());
+        removeHierarchy(child);
     }
 }
 

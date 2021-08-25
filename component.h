@@ -9,9 +9,7 @@ namespace diorama {
 
 class World;
 
-// should always be owned by a shared_ptr (never on the stack)
 class Component
-    : public std::enable_shared_from_this<Component>
 {
 public:
     Component();
@@ -19,6 +17,7 @@ public:
     // does not copy world
     Component(const Component &other);
     Component & operator=(const Component &rhs);
+    ~Component();
 
     string name;  // shouldn't change after adding to world
     Mesh *mesh = nullptr;  // could be null
@@ -29,10 +28,11 @@ public:
     Transform & tLocalMut();
 
     Component * parent() const;
+    // parent takes ownership of child
     void setParent(Component *parent);
-    const vector<shared_ptr<Component>> children() const;
+    const vector<Component *> children() const;
 
-    shared_ptr<Component> cloneHierarchy();
+    Component * cloneHierarchy();
 
     World * world() const;
     void setWorld(World *world);  // called by World
@@ -42,7 +42,7 @@ private:
     // TODO cache world matrix
 
     Component *_parent = nullptr;  // instead of weak_ptr
-    vector<shared_ptr<Component>> _children;
+    vector<Component *> _children;
 
     World *_world = nullptr;
 };

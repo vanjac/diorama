@@ -11,8 +11,9 @@ public:
     // takes ownership
     void addResource(Resource *resource);
 
-    shared_ptr<Component> root() const;
-    void setRoot(shared_ptr<Component> root);
+    Component * root() const;
+    // takes ownership
+    void setRoot(Component *root);
 
     // called by Component
     void addHierarchy(Component *component);
@@ -42,7 +43,7 @@ private:
 
     vector<unique_ptr<Resource>> _resources;
 
-    shared_ptr<Component> _root;
+    unique_ptr<Component> _root;
 
     // map component name to list of components with that name
     std::unordered_map<string, vector<Component *>> names;

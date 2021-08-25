@@ -96,7 +96,7 @@ void SkpLoader::loadGlobal()
     }
 
     for (auto &defPair : defs) {
-        shared_ptr<Component> component(new Component);
+        Component * component = new Component;
 
         SUStringRef nameStr = createString();
         CHECK(SUComponentDefinitionGetName(defPair.second, &nameStr));
@@ -109,15 +109,15 @@ void SkpLoader::loadGlobal()
         // component definitions don't seem to use materials
         loadEntities(entities, *component);
         int32_t id = getID(SUComponentDefinitionToEntity(defPair.second));
-        componentDefinitions[id] = component;
+        componentDefinitions[id] = unique_ptr<Component>(component);
     }
 
     glBindVertexArray(0);
 }
 
-shared_ptr<Component> SkpLoader::loadRoot()
+Component * SkpLoader::loadRoot()
 {
-    shared_ptr<Component> root(new Component);
+    Component *root = new Component;
     root->name = "root";
     SUEntitiesRef entities = SU_INVALID;
     CHECK(SUModelGetEntities(model, &entities));
@@ -167,7 +167,7 @@ void SkpLoader::loadEntities(SUEntitiesRef entities, Component &component)
     }
 }
 
-shared_ptr<Component> SkpLoader::loadInstance(SUComponentInstanceRef instance)
+Component * SkpLoader::loadInstance(SUComponentInstanceRef instance)
 {
     SUComponentDefinitionRef definition = SU_INVALID;
     CHECK(SUComponentInstanceGetDefinition(instance, &definition));
@@ -175,20 +175,10 @@ shared_ptr<Component> SkpLoader::loadInstance(SUComponentInstanceRef instance)
     auto defIt = componentDefinitions.find(definitionID);
     if (defIt == componentDefinitions.end()) {
         printf("  Definition %d not loaded!\n", definitionID);
-        return shared_ptr<Component>(new Component);
+        return new Component;
     }
 
-    size_t numInstances;
-    // NOT NumUsedInstances!
-    CHECK(SUComponentDefinitionGetNumInstances(definition, &numInstances));
-
-    shared_ptr<Component> component;
-    if (numInstances == 1) {
-        printf("  (unique)");
-        component = defIt->second;  // unique, don't clone hierarchy
-    } else {
-        component = defIt->second->cloneHierarchy();
-    }
+    Component *component = defIt->second->cloneHierarchy();
 
     SUStringRef nameStr = createString();
     CHECK(SUComponentInstanceGetName(instance, &nameStr));

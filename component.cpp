@@ -22,6 +22,13 @@ Component & Component::operator=(const Component &rhs)
     return *this;
 }
 
+Component::~Component()
+{
+    for (auto &child : _children) {
+        delete child;
+    }
+}
+
 const Transform & Component::tLocal() const
 {
     return _tLocal;
@@ -41,36 +48,34 @@ void Component::setParent(Component *parent)
 {
     if (parent == _parent)
         return;
-    shared_ptr<Component> sharedThis = shared_from_this();
     if (_parent) {
         auto &childrenVec = _parent->_children;
         // TODO fast remove without preserving order
-        auto childIt = std::find(childrenVec.begin(), childrenVec.end(),
-                                 sharedThis);
+        auto childIt = std::find(childrenVec.begin(), childrenVec.end(), this);
         if (childIt != childrenVec.end())
             childrenVec.erase(childIt);
     }
     _parent = parent;
     if (parent) {
-        parent->_children.push_back(sharedThis);
+        parent->_children.push_back(this);
         setWorld(parent->world());
     } else {
         setWorld(nullptr);
     }
 }
 
-const vector<shared_ptr<Component>> Component::children() const
+const vector<Component *> Component::children() const
 {
     return _children;
 }
 
-shared_ptr<Component> Component::cloneHierarchy()
+Component * Component::cloneHierarchy()
 {
-    shared_ptr<Component> copy(new Component(*this));
+    Component *copy = new Component(*this);
     for (auto &child : _children) {
-        shared_ptr<Component> childCopy = child->cloneHierarchy();
+        Component *childCopy = child->cloneHierarchy();
         // should have no world so this should be fine
-        childCopy->setParent(copy.get());
+        childCopy->setParent(copy);
     }
     return copy;
 }
