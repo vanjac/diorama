@@ -5,7 +5,8 @@ namespace diorama {
 
 // An object which is owned by the World and shared by various Components within
 // the World.
-class Resource {
+class Resource : noncopyable
+{
 public:
     virtual ~Resource() = default;
 };
