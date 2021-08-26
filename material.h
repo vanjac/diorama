@@ -3,7 +3,6 @@
 
 #include "glutils.h"
 #include "resource.h"
-#include <initializer_list>
 #include <glm/glm.hpp>
 
 namespace diorama {
@@ -29,7 +28,7 @@ public:
     ShaderProgram();
     ~ShaderProgram();
 
-    void link(string name, std::initializer_list<GLShader> shaders);
+    void link(string name, initializer_list<GLShader> shaders);
 
     GLProgram glProgram;
     GLUniformLocation baseColorLoc = -1;
@@ -49,7 +48,7 @@ public:
 
 private:
     GLShader compileShader(GLConst type, string name,
-        std::initializer_list<string> sources);
+        initializer_list<string> sources);
 
     GLShader basicVert = 0;
 };

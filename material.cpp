@@ -19,7 +19,7 @@ ShaderProgram::~ShaderProgram()
     glDeleteProgram(glProgram);
 }
 
-void ShaderProgram::link(string name, std::initializer_list<GLShader> shaders) {
+void ShaderProgram::link(string name, initializer_list<GLShader> shaders) {
     for (auto &shader : shaders)
         glAttachShader(glProgram, shader);
 
@@ -82,7 +82,7 @@ ShaderManager::ShaderManager()
 }
 
 GLShader ShaderManager::compileShader(GLConst type, string name,
-        std::initializer_list<string> sources)
+                                      initializer_list<string> sources)
 {
     GLShader shader = glCreateShader(type);
     vector<const char *> sourcePtrs;

@@ -15,6 +15,9 @@ using std::array;
 #include <unordered_map>
 using std::unordered_map;
 
+#include <initializer_list>
+using std::initializer_list;
+
 namespace diorama {
 
 class noncopyable {
