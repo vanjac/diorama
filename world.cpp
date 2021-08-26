@@ -1,4 +1,5 @@
 #include "world.h"
+#include <cstdio>
 
 namespace diorama {
 

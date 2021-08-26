@@ -1,4 +1,5 @@
 #include "load_skp.h"
+#include <cstdio>
 #include <exception>
 #include <map>
 #include <GL/gl3w.h>

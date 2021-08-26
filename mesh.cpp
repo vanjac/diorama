@@ -1,6 +1,5 @@
 #include "mesh.h"
 #include <GL/gl3w.h>
-#include <cstdio>
 
 namespace diorama {
 

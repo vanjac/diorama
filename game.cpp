@@ -1,5 +1,6 @@
 #include "game.h"
 #include "load_skp.h"
+#include <cstdio>
 #include <GL/gl3w.h>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>

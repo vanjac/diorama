@@ -1,5 +1,6 @@
 #include "material.h"
 #include "shadersource.h"
+#include <cstdio>
 #include <exception>
 #include <GL/gl3w.h>
 #include "world.h"
