@@ -55,10 +55,8 @@ int Game::main(const vector<string> args)
 
     shaders.init();
 
-    defaultMaterial = new Material;
-    world.addResource(defaultMaterial);
-    defaultMaterial->shader = &shaders.coloredProg;
-    defaultMaterial->texture = &Texture::NO_TEXTURE ;
+    defaultMaterial.shader = &shaders.coloredProg;
+    defaultMaterial.texture = &Texture::NO_TEXTURE ;
 
     {
         SkpLoader loader(path, world, shaders);
@@ -127,11 +125,11 @@ int Game::main(const vector<string> args)
         transform.ViewMatrix = camTransform.inverse().matrix();
 
         transform.ModelMatrix = glm::mat4(1);
-        renderHierarchy(*world.root(), defaultMaterial, false);
+        renderHierarchy(*world.root(), &defaultMaterial, false);
         glEnable(GL_BLEND);
         glDepthMask(GL_FALSE);
         transform.ModelMatrix = glm::mat4(1);
-        renderHierarchy(*world.root(), defaultMaterial, true);
+        renderHierarchy(*world.root(), &defaultMaterial, true);
         glDisable(GL_BLEND);
         glDepthMask(GL_TRUE);
 

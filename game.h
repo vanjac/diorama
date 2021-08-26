@@ -35,7 +35,7 @@ private:
     bool running = true;
 
     ShaderManager shaders;
-    Material *defaultMaterial = nullptr;
+    Material defaultMaterial;
 
     TransformBlock transform;
     GLBuffer transformUBO;  // shared between all programs
