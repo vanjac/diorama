@@ -33,7 +33,7 @@ struct ShaderProgram : Resource
 class ShaderManager
 {
 public:
-    void init();
+    ShaderManager();
 
     ShaderProgram coloredProg;
     ShaderProgram texturedProg;

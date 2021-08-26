@@ -53,8 +53,6 @@ int Game::main(const vector<string> args)
     glBindBufferBase(GL_UNIFORM_BUFFER,
         ShaderProgram::BIND_TRANSFORM, transformUBO);
 
-    shaders.init();
-
     defaultMaterial.shader = &shaders.coloredProg;
     defaultMaterial.texture = &Texture::NO_TEXTURE ;
 

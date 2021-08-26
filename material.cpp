@@ -8,7 +8,7 @@ namespace diorama {
 
 const Texture Texture::NO_TEXTURE = Texture();
 
-void ShaderManager::init()
+ShaderManager::ShaderManager()
 {
     basicVert = compileShader(GL_VERTEX_SHADER, "Vertex",
         {VERSION_DIRECTIVE, vertShaderSrc});
