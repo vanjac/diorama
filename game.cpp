@@ -53,12 +53,12 @@ int Game::main(const vector<string> args)
     glBindBufferBase(GL_UNIFORM_BUFFER,
         ShaderProgram::BIND_TRANSFORM, transformUBO);
 
-    shaders.init(world);
+    shaders.init();
 
     defaultMaterial = new Material;
     world.addResource(defaultMaterial);
-    defaultMaterial->shader = shaders.coloredProg;
-    defaultMaterial->texture = shaders.noTexture;
+    defaultMaterial->shader = &shaders.coloredProg;
+    defaultMaterial->texture = &Texture::NO_TEXTURE ;
 
     {
         SkpLoader loader(path, world, shaders);
@@ -268,9 +268,9 @@ void Game::debugLine(glm::vec3 start, glm::vec3 end, glm::vec3 color)
     glBindBuffer(GL_ARRAY_BUFFER, debugVertexBuffer);
     glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(data), data);
 
-    glUseProgram(shaders.debugProg->glProgram);
+    glUseProgram(shaders.debugProg.glProgram);
     glm::vec4 color4(color, 1);
-    glUniform4fv(shaders.debugProg->baseColorLoc, 1, glm::value_ptr(color4));
+    glUniform4fv(shaders.debugProg.baseColorLoc, 1, glm::value_ptr(color4));
 
     glDrawArrays(GL_LINES, 0, 2);
 }

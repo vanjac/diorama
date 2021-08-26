@@ -6,11 +6,10 @@
 
 namespace diorama {
 
-void ShaderManager::init(World &world)
-{
-    noTexture = new Texture;
-    world.addResource(noTexture);
+const Texture Texture::NO_TEXTURE = Texture();
 
+void ShaderManager::init()
+{
     basicVert = compileShader(GL_VERTEX_SHADER, "Vertex",
         {VERSION_DIRECTIVE, vertShaderSrc});
     GLShader coloredFrag = compileShader(GL_FRAGMENT_SHADER, "Fragment",
@@ -30,32 +29,22 @@ void ShaderManager::init(World &world)
     GLShader debugFrag = compileShader(GL_FRAGMENT_SHADER, "Fragment",
         {VERSION_DIRECTIVE, debugFragShaderSrc});
 
-    coloredProg = new ShaderProgram;
-    world.addResource(coloredProg);
-    coloredProg->glProgram = linkProgram("Program", {basicVert, coloredFrag});
-    setProgramBindings(*coloredProg);
+    coloredProg.glProgram = linkProgram("Program", {basicVert, coloredFrag});
+    setProgramBindings(coloredProg);
 
-    texturedProg = new ShaderProgram;
-    world.addResource(texturedProg);
-    texturedProg->glProgram = linkProgram("Program", {basicVert, texturedFrag});
-    setProgramBindings(*texturedProg);
+    texturedProg.glProgram = linkProgram("Program", {basicVert, texturedFrag});
+    setProgramBindings(texturedProg);
 
-    shiftedTextureProg = new ShaderProgram;
-    world.addResource(shiftedTextureProg);
-    shiftedTextureProg->glProgram = linkProgram("Program",
+    shiftedTextureProg.glProgram = linkProgram("Program",
         {basicVert, shiftedTextureFrag});
-    setProgramBindings(*shiftedTextureProg);
+    setProgramBindings(shiftedTextureProg);
 
-    tintedTextureProg = new ShaderProgram;
-    world.addResource(tintedTextureProg);
-    tintedTextureProg->glProgram = linkProgram("Program",
+    tintedTextureProg.glProgram = linkProgram("Program",
         {basicVert, tintedTextureFrag});
-    setProgramBindings(*tintedTextureProg);
+    setProgramBindings(tintedTextureProg);
 
-    debugProg = new ShaderProgram;
-    world.addResource(debugProg);
-    debugProg->glProgram = linkProgram("Program", {basicVert, debugFrag});
-    setProgramBindings(*debugProg);
+    debugProg.glProgram = linkProgram("Program", {basicVert, debugFrag});
+    setProgramBindings(debugProg);
 
     glDeleteShader(coloredFrag);
     glDeleteShader(texturedFrag);

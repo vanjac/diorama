@@ -8,8 +8,6 @@
 
 namespace diorama {
 
-class World;
-
 // matches interface block in shader
 // TODO: split off Model and Normal?
 struct TransformBlock
@@ -32,23 +30,16 @@ struct ShaderProgram : Resource
     GLUniformLocation textureScaleLoc = -1;
 };
 
-struct Texture : Resource
-{
-    GLTexture glTexture = 0;
-};
-
 class ShaderManager
 {
 public:
-    void init(World &world);
+    void init();
 
-    Texture *noTexture = nullptr;
-
-    ShaderProgram *coloredProg = nullptr;
-    ShaderProgram *texturedProg = nullptr;
-    ShaderProgram *shiftedTextureProg = nullptr;
-    ShaderProgram *tintedTextureProg = nullptr;
-    ShaderProgram *debugProg = nullptr;
+    ShaderProgram coloredProg;
+    ShaderProgram texturedProg;
+    ShaderProgram shiftedTextureProg;
+    ShaderProgram tintedTextureProg;
+    ShaderProgram debugProg;
 
 private:
     GLShader compileShader(GLType type, string name,
@@ -57,6 +48,13 @@ private:
     void setProgramBindings(ShaderProgram &program);
 
     GLShader basicVert = 0;
+};
+
+struct Texture : Resource
+{
+    static const Texture NO_TEXTURE;
+
+    GLTexture glTexture = 0;
 };
 
 struct Material : Resource

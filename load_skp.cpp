@@ -361,9 +361,9 @@ Material * SkpLoader::loadMaterial(SUMaterialRef suMaterial)
     if (type == SUMaterialType_Colored) {
         SUColor color;
         CHECK(SUMaterialGetColor(suMaterial, &color));
-        material->shader = shaders.coloredProg;
+        material->shader = &shaders.coloredProg;
         material->color = colorToVec(color);
-        material->texture = shaders.noTexture;
+        material->texture = &Texture::NO_TEXTURE;
         printf("  Solid color %f %f %f %f\n",
             material->color.r, material->color.g, material->color.b,
             material->color.a);
@@ -386,17 +386,17 @@ Material * SkpLoader::loadMaterial(SUMaterialRef suMaterial)
             CHECK(SUMaterialGetColorizeType(suMaterial, &type));
             if (type == SUMaterialColorizeType_Tint) {
                 printf("  Colorize (tint)\n");
-                material->shader = shaders.tintedTextureProg;
+                material->shader = &shaders.tintedTextureProg;
             } else if (type == SUMaterialColorizeType_Shift) {
                 printf("  Colorize (shift)\n");
-                material->shader = shaders.shiftedTextureProg;
+                material->shader = &shaders.shiftedTextureProg;
             }
 
             double hue, sat, light;
             CHECK(SUMaterialGetColorizeDeltas(suMaterial, &hue, &sat, &light));
             material->color = glm::vec4(hue, sat, light, alpha);
         } else {
-            material->shader = shaders.texturedProg;
+            material->shader = &shaders.texturedProg;
             material->color = glm::vec4(1,1,1,alpha);
         }
     }
