@@ -66,7 +66,7 @@ int Game::main(const vector<string> args)
     glBindVertexArray(debugVertexArray);
     glGenBuffers(1, &debugVertexBuffer);
     glBindBuffer(GL_ARRAY_BUFFER, debugVertexBuffer);
-    glm::vec3 initVertices[2] { {0,0,0}, {0,0,0} };
+    glm::vec3 initVertices[] { {0,0,0}, {0,0,0} };
     glBufferData(GL_ARRAY_BUFFER, sizeof(initVertices), initVertices,
                  GL_STREAM_DRAW);
     glVertexAttribPointer(RenderPrimitive::ATTRIB_POSITION, 3, GL_FLOAT,
@@ -259,7 +259,7 @@ void Game::setTexture(int unit, GLTexture texture)
 
 void Game::debugLine(glm::vec3 start, glm::vec3 end, glm::vec3 color)
 {
-    glm::vec3 data[2] {start, end};
+    glm::vec3 data[] {start, end};
     glBindVertexArray(debugVertexArray);
     glBindBuffer(GL_ARRAY_BUFFER, debugVertexBuffer);
     glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(data), data);
