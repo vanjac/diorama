@@ -18,7 +18,7 @@ struct TransformBlock
     glm::mat4 ProjectionMatrix {1};
 };
 
-class ShaderProgram : Resource
+class ShaderProgram : public Resource
 {
 public:
     enum BufferBindingPoints
@@ -31,7 +31,7 @@ public:
 
     void link(string name, std::initializer_list<GLShader> shaders);
 
-    GLProgram glProgram = 0;
+    GLProgram glProgram;
     GLUniformLocation baseColorLoc = -1;
     GLUniformLocation textureScaleLoc = -1;
 };
@@ -54,14 +54,19 @@ private:
     GLShader basicVert = 0;
 };
 
-struct Texture : Resource
+class Texture : public Resource
 {
+public:
     static const Texture NO_TEXTURE;
 
-    GLTexture glTexture = 0;
+    Texture();
+    Texture(GLTexture glTexture);
+    ~Texture();
+
+    GLTexture glTexture;
 };
 
-struct Material : Resource
+struct Material : public Resource
 {
     enum TextureUnits
     {

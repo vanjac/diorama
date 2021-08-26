@@ -6,7 +6,7 @@
 
 namespace diorama {
 
-const Texture Texture::NO_TEXTURE = Texture();
+const Texture Texture::NO_TEXTURE(0);
 
 ShaderProgram::ShaderProgram()
 {
@@ -104,6 +104,20 @@ GLShader ShaderManager::compileShader(GLConst type, string name,
         throw std::exception("Shader compile error");
     }
     return shader;
+}
+
+Texture::Texture()
+{
+    glGenTextures(1, &glTexture);
+}
+
+Texture::Texture(GLTexture glTexture)
+    : glTexture(glTexture)
+{}
+
+Texture::~Texture()
+{
+    glDeleteTextures(1, &glTexture);
 }
 
 }  // namespace

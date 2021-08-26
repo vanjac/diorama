@@ -54,7 +54,7 @@ int Game::main(const vector<string> args)
         ShaderProgram::BIND_TRANSFORM, transformUBO);
 
     defaultMaterial.shader = &shaders.coloredProg;
-    defaultMaterial.texture = &Texture::NO_TEXTURE ;
+    defaultMaterial.texture = &Texture::NO_TEXTURE;
 
     {
         SkpLoader loader(path, world, shaders);

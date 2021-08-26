@@ -434,7 +434,6 @@ Texture * SkpLoader::loadTexture(SUTextureRef suTexture)
     Texture * texture(new Texture);
     world.addResource(texture);
 
-    glGenTextures(1, &texture->glTexture);
     glBindTexture(GL_TEXTURE_2D, texture->glTexture);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA,
                  width, height, 0,
