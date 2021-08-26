@@ -16,6 +16,6 @@ using GLProgram = GLObject;
 using GLUniformLocation = int32_t;
 
 // replacement for GLenum
-using GLType = uint32_t;
+using GLConst = uint32_t;
 
 }  // namespace

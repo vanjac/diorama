@@ -53,7 +53,7 @@ void ShaderManager::init()
     glDeleteShader(debugFrag);
 }
 
-GLShader ShaderManager::compileShader(GLType type, string name,
+GLShader ShaderManager::compileShader(GLConst type, string name,
         std::initializer_list<string> sources)
 {
     GLShader shader = glCreateShader(type);

@@ -42,7 +42,7 @@ public:
     ShaderProgram debugProg;
 
 private:
-    GLShader compileShader(GLType type, string name,
+    GLShader compileShader(GLConst type, string name,
         std::initializer_list<string> sources);
     GLProgram linkProgram(string name, std::initializer_list<GLShader> shaders);
     void setProgramBindings(ShaderProgram &program);
