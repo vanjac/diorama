@@ -8,6 +8,45 @@ namespace diorama {
 
 const Texture Texture::NO_TEXTURE = Texture();
 
+ShaderProgram::ShaderProgram()
+{
+    glProgram = glCreateProgram();
+}
+
+ShaderProgram::~ShaderProgram()
+{
+    glDeleteProgram(glProgram);
+}
+
+void ShaderProgram::link(string name, std::initializer_list<GLShader> shaders) {
+    for (auto &shader : shaders)
+        glAttachShader(glProgram, shader);
+
+    glLinkProgram(glProgram);
+    GLint linked;
+    glGetProgramiv(glProgram, GL_LINK_STATUS, &linked);
+    if (!linked) {
+        GLint logLen;
+        glGetProgramiv(glProgram, GL_INFO_LOG_LENGTH, &logLen);
+        unique_ptr<char[]> log(new char[logLen]);
+        glGetProgramInfoLog(glProgram, logLen, NULL, log.get());
+        printf("%s link error: %s", name.c_str(), log.get());
+        throw std::exception("Program link error");
+    }
+    
+    baseColorLoc = glGetUniformLocation(glProgram, "BaseColor");
+    textureScaleLoc = glGetUniformLocation(glProgram, "TextureScale");
+
+    glUseProgram(glProgram);
+    GLuint transformIdx = glGetUniformBlockIndex(glProgram, "TransformBlock");
+    glUniformBlockBinding(glProgram,
+        transformIdx, ShaderProgram::BIND_TRANSFORM);
+
+    GLUniformLocation baseTextureLoc = glGetUniformLocation(
+        glProgram, "BaseTexture");
+    glUniform1i(baseTextureLoc, Material::TEXTURE_BASE);
+}
+
 ShaderManager::ShaderManager()
 {
     basicVert = compileShader(GL_VERTEX_SHADER, "Vertex",
@@ -29,22 +68,11 @@ ShaderManager::ShaderManager()
     GLShader debugFrag = compileShader(GL_FRAGMENT_SHADER, "Fragment",
         {VERSION_DIRECTIVE, debugFragShaderSrc});
 
-    coloredProg.glProgram = linkProgram("Program", {basicVert, coloredFrag});
-    setProgramBindings(coloredProg);
-
-    texturedProg.glProgram = linkProgram("Program", {basicVert, texturedFrag});
-    setProgramBindings(texturedProg);
-
-    shiftedTextureProg.glProgram = linkProgram("Program",
-        {basicVert, shiftedTextureFrag});
-    setProgramBindings(shiftedTextureProg);
-
-    tintedTextureProg.glProgram = linkProgram("Program",
-        {basicVert, tintedTextureFrag});
-    setProgramBindings(tintedTextureProg);
-
-    debugProg.glProgram = linkProgram("Program", {basicVert, debugFrag});
-    setProgramBindings(debugProg);
+    coloredProg.link("Program", {basicVert, coloredFrag});
+    texturedProg.link("Program", {basicVert, texturedFrag});
+    shiftedTextureProg.link("Program", {basicVert, shiftedTextureFrag});
+    tintedTextureProg.link("Program", {basicVert, tintedTextureFrag});
+    debugProg.link("Program", {basicVert, debugFrag});
 
     glDeleteShader(coloredFrag);
     glDeleteShader(texturedFrag);
@@ -76,45 +104,6 @@ GLShader ShaderManager::compileShader(GLConst type, string name,
         throw std::exception("Shader compile error");
     }
     return shader;
-}
-
-GLProgram ShaderManager::linkProgram(string name,
-        std::initializer_list<GLShader> shaders)
-{
-    GLProgram program = glCreateProgram();
-    for (auto &shader : shaders)
-        glAttachShader(program, shader);
-
-    glLinkProgram(program);
-    GLint linked;
-    glGetProgramiv(program, GL_LINK_STATUS, &linked);
-    if (!linked) {
-        GLint logLen;
-        glGetProgramiv(program, GL_INFO_LOG_LENGTH, &logLen);
-        unique_ptr<char[]> log(new char[logLen]);
-        glGetProgramInfoLog(program, logLen, NULL, log.get());
-        printf("%s link error: %s", name.c_str(), log.get());
-        throw std::exception("Program link error");
-    }
-    return program;
-}
-
-void ShaderManager::setProgramBindings(ShaderProgram &program)
-{
-    program.baseColorLoc = glGetUniformLocation(
-        program.glProgram, "BaseColor");
-    program.textureScaleLoc = glGetUniformLocation(
-        program.glProgram, "TextureScale");
-
-    glUseProgram(program.glProgram);
-    GLuint transformIdx = glGetUniformBlockIndex(
-        program.glProgram, "TransformBlock");
-    glUniformBlockBinding(program.glProgram,
-        transformIdx, ShaderProgram::BIND_TRANSFORM);
-
-    GLUniformLocation baseTextureLoc = glGetUniformLocation(
-        program.glProgram, "BaseTexture");
-    glUniform1i(baseTextureLoc, Material::TEXTURE_BASE);
 }
 
 }  // namespace

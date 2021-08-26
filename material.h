@@ -18,12 +18,18 @@ struct TransformBlock
     glm::mat4 ProjectionMatrix {1};
 };
 
-struct ShaderProgram : Resource
+class ShaderProgram : Resource
 {
+public:
     enum BufferBindingPoints
     {
         BIND_TRANSFORM
     };
+
+    ShaderProgram();
+    ~ShaderProgram();
+
+    void link(string name, std::initializer_list<GLShader> shaders);
 
     GLProgram glProgram = 0;
     GLUniformLocation baseColorLoc = -1;
@@ -44,8 +50,6 @@ public:
 private:
     GLShader compileShader(GLConst type, string name,
         std::initializer_list<string> sources);
-    GLProgram linkProgram(string name, std::initializer_list<GLShader> shaders);
-    void setProgramBindings(ShaderProgram &program);
 
     GLShader basicVert = 0;
 };
