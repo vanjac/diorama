@@ -39,8 +39,7 @@ void ShaderProgram::link(string name, std::initializer_list<GLShader> shaders) {
 
     glUseProgram(glProgram);
     GLuint transformIdx = glGetUniformBlockIndex(glProgram, "TransformBlock");
-    glUniformBlockBinding(glProgram,
-        transformIdx, ShaderProgram::BIND_TRANSFORM);
+    glUniformBlockBinding(glProgram, transformIdx, BIND_TRANSFORM);
 
     GLUniformLocation baseTextureLoc = glGetUniformLocation(
         glProgram, "BaseTexture");

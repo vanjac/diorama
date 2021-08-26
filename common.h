@@ -9,6 +9,9 @@ using std::string;
 #include <vector>
 using std::vector;
 
+#include <array>
+using std::array;
+
 #include <unordered_map>
 using std::unordered_map;
 

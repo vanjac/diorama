@@ -295,11 +295,7 @@ Mesh * SkpLoader::loadMesh(SUEntitiesRef entities)
             }
         }
 
-        glGenVertexArrays(1, &primitive.vertexArray);
         glBindVertexArray(primitive.vertexArray);
-
-        // generate buffers for each vertex attribute
-        glGenBuffers(RenderPrimitive::ATTRIB_MAX, primitive.attribBuffers);
 
         size_t vertexBufferSize = build.vertices.size() * sizeof(glm::vec3);
         glBindBuffer(GL_ARRAY_BUFFER,
@@ -326,8 +322,6 @@ Mesh * SkpLoader::loadMesh(SUEntitiesRef entities)
         for (int i = 0; i < RenderPrimitive::ATTRIB_MAX; i++)
             glEnableVertexAttribArray(i);
 
-        // generate buffer for element indices
-        glGenBuffers(1, &primitive.elementBuffer);
         // binding is stored in VAO
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, primitive.elementBuffer);
         glBufferData(GL_ELEMENT_ARRAY_BUFFER,

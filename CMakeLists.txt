@@ -11,6 +11,7 @@ link_directories(
 add_executable(diorama
     mathutils.cpp
     material.cpp
+    mesh.cpp
     component.cpp
     world.cpp
     collision.cpp

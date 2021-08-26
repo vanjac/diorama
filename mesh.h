@@ -9,16 +9,21 @@ namespace diorama {
 
 using MeshIndex = uint16_t;
 
-struct RenderPrimitive
+class RenderPrimitive : noncopyable
 {
+public:
     enum VertexAttributes
     {
         ATTRIB_POSITION, ATTRIB_NORMAL, ATTRIB_STQ, ATTRIB_MAX
     };
 
-    GLVertexArray vertexArray = 0;
-    GLBuffer attribBuffers[ATTRIB_MAX] {0};
-    GLBuffer elementBuffer = 0;
+    RenderPrimitive();
+    ~RenderPrimitive();
+    RenderPrimitive(RenderPrimitive &&other);
+
+    GLVertexArray vertexArray;
+    array<GLBuffer, ATTRIB_MAX> attribBuffers;  // buffers for vertex attributes
+    GLBuffer elementBuffer;  // buffer for element indices
     int numIndices = 0;
 
     Material *material = nullptr;  // null for default material
