@@ -37,8 +37,6 @@ SkpLoader::~SkpLoader()
 
 void SkpLoader::loadGlobal()
 {
-    glActiveTexture(GL_TEXTURE0);  // for creating textures
-
     size_t numMaterials;
     // get "All" materials to include Images (also Layers which are unused)
     CHECK(SUModelGetNumAllMaterials(model, &numMaterials));
@@ -49,7 +47,6 @@ void SkpLoader::loadGlobal()
         int32_t id = getID(SUMaterialToEntity(materials[i]));
         loadedMaterials[id] = loadMaterial(materials[i]);
     }
-    glBindTexture(GL_TEXTURE_2D, 0);
 
     // IDs seem to follow dependency order, so load definitions in order of ID
     std::map<int32_t, SUComponentDefinitionRef> defs;
@@ -428,15 +425,7 @@ Texture * SkpLoader::loadTexture(SUTextureRef suTexture)
 
     Texture * texture(new Texture);
     world.addResource(texture);
-
-    glBindTexture(GL_TEXTURE_2D, texture->glTexture);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA,
-                 width, height, 0,
-                 GL_RGBA, GL_UNSIGNED_BYTE, colors.get());
-    glGenerateMipmap(GL_TEXTURE_2D);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
-                    GL_LINEAR_MIPMAP_LINEAR);  // trilinear
+    texture->setImage(width, height, GL_RGBA, GL_UNSIGNED_BYTE, colors.get());
 
     loadedTextures[fileName] = texture;
     return texture;

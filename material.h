@@ -62,6 +62,9 @@ public:
     Texture(GLTexture glTexture);
     ~Texture();
 
+    void setImage(int width, int height, GLConst format, GLConst type,
+                  const void * data);
+
     GLTexture glTexture;
 };
 
