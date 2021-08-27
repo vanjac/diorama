@@ -121,7 +121,7 @@ Texture::~Texture()
 }
 
 void Texture::setImage(int width, int height, GLConst format, GLConst type,
-                       const void * data)
+                       const void *data)
 {
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, glTexture);

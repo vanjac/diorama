@@ -32,4 +32,26 @@ RenderPrimitive::RenderPrimitive(RenderPrimitive &&other)
     other.material = nullptr;
 }
 
+void RenderPrimitive::setAttribData(VertexAttribute attrib, size_t size,
+    int components, GLConst type, const void *data)
+{
+    glBindVertexArray(vertexArray);
+    glBindBuffer(GL_ARRAY_BUFFER, attribBuffers[attrib]);
+    glBufferData(GL_ARRAY_BUFFER, size, data, GL_STATIC_DRAW);
+    glVertexAttribPointer(attrib, components, type, GL_FALSE, 0, (void *)0);
+    glEnableVertexAttribArray(attrib);
+    glBindVertexArray(0);
+}
+
+void RenderPrimitive::setIndices(int numIndices, const MeshIndex *indices)
+{
+    glBindVertexArray(vertexArray);
+    // binding is stored in VAO
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementBuffer);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, numIndices * sizeof(MeshIndex),
+                 indices, GL_STATIC_DRAW);
+    glBindVertexArray(0);
+    this->numIndices = numIndices;
+}
+
 }  // namespace

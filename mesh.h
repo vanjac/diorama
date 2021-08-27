@@ -12,7 +12,7 @@ using MeshIndex = uint16_t;
 class RenderPrimitive : noncopyable
 {
 public:
-    enum VertexAttributes
+    enum VertexAttribute
     {
         ATTRIB_POSITION, ATTRIB_NORMAL, ATTRIB_STQ, ATTRIB_MAX
     };
@@ -20,6 +20,10 @@ public:
     RenderPrimitive();
     ~RenderPrimitive();
     RenderPrimitive(RenderPrimitive &&other);
+
+    void setAttribData(VertexAttribute attrib, size_t size,
+                       int components, GLConst type, const void *data);
+    void setIndices(int numIndices, const MeshIndex *indices);
 
     GLVertexArray vertexArray;
     array<GLBuffer, ATTRIB_MAX> attribBuffers;  // buffers for vertex attributes

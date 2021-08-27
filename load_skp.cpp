@@ -109,8 +109,6 @@ void SkpLoader::loadGlobal()
         int32_t id = getID(SUComponentDefinitionToEntity(defPair.second));
         componentDefinitions[id] = unique_ptr<Component>(component);
     }
-
-    glBindVertexArray(0);
 }
 
 Component * SkpLoader::loadRoot()
@@ -121,7 +119,6 @@ Component * SkpLoader::loadRoot()
     CHECK(SUModelGetEntities(model, &entities));
     printf("Model:\n");
     loadEntities(entities, *root);
-    glBindVertexArray(0);
     return root;
 }
 
@@ -293,40 +290,15 @@ Mesh * SkpLoader::loadMesh(SUEntitiesRef entities)
             }
         }
 
-        glBindVertexArray(primitive.vertexArray);
-
         size_t vertexBufferSize = build.vertices.size() * sizeof(glm::vec3);
-        glBindBuffer(GL_ARRAY_BUFFER,
-                     primitive.attribBuffers[RenderPrimitive::ATTRIB_POSITION]);
-        glBufferData(GL_ARRAY_BUFFER, vertexBufferSize,
-                     &build.vertices[0], GL_STATIC_DRAW);
-        glVertexAttribPointer(RenderPrimitive::ATTRIB_POSITION, 3, GL_FLOAT,
-                              GL_FALSE, 0, (void *)0);
-
-        glBindBuffer(GL_ARRAY_BUFFER,
-                     primitive.attribBuffers[RenderPrimitive::ATTRIB_NORMAL]);
-        glBufferData(GL_ARRAY_BUFFER, vertexBufferSize,
-                     &build.normals[0], GL_STATIC_DRAW);
-        glVertexAttribPointer(RenderPrimitive::ATTRIB_NORMAL, 3, GL_FLOAT,
-                              GL_FALSE, 0, (void *)0);
-
-        glBindBuffer(GL_ARRAY_BUFFER,
-                     primitive.attribBuffers[RenderPrimitive::ATTRIB_STQ]);
-        glBufferData(GL_ARRAY_BUFFER, vertexBufferSize,
-                     &build.stqCoords[0], GL_STATIC_DRAW);
-        glVertexAttribPointer(RenderPrimitive::ATTRIB_STQ, 3, GL_FLOAT,
-                              GL_FALSE, 0, (void *)0);
-
-        for (int i = 0; i < RenderPrimitive::ATTRIB_MAX; i++)
-            glEnableVertexAttribArray(i);
-
-        // binding is stored in VAO
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, primitive.elementBuffer);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER,
-                     build.indices.size() * sizeof(MeshIndex),
-                     &build.indices[0], GL_STATIC_DRAW);
-        primitive.numIndices = build.indices.size();
-    }  // for each material primitive
+        primitive.setAttribData(RenderPrimitive::ATTRIB_POSITION,
+            vertexBufferSize, 3, GL_FLOAT, &build.vertices[0]);
+        primitive.setAttribData(RenderPrimitive::ATTRIB_NORMAL,
+            vertexBufferSize, 3, GL_FLOAT, &build.normals[0]);
+        primitive.setAttribData(RenderPrimitive::ATTRIB_STQ,
+            vertexBufferSize, 3, GL_FLOAT, &build.stqCoords[0]);
+        primitive.setIndices(build.indices.size(), &build.indices[0]);
+    }
 
     printf("  %zu primitives\n", mesh->render.size());
     return mesh;

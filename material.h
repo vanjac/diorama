@@ -20,7 +20,7 @@ struct TransformBlock
 class ShaderProgram : public Resource
 {
 public:
-    enum BufferBindingPoints
+    enum BufferBindingPoint
     {
         BIND_TRANSFORM
     };
@@ -63,14 +63,14 @@ public:
     ~Texture();
 
     void setImage(int width, int height, GLConst format, GLConst type,
-                  const void * data);
+                  const void *data);
 
     GLTexture glTexture;
 };
 
 struct Material : public Resource
 {
-    enum TextureUnits
+    enum TextureUnit
     {
         TEXTURE_BASE
     };
