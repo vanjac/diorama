@@ -22,7 +22,7 @@ public:
     RenderPrimitive(RenderPrimitive &&other);
 
     void setAttribData(VertexAttribute attrib, size_t size,
-                       int components, GLConst type, const void *data);
+                       int components, GLDataType type, const void *data);
     void setIndices(int numIndices, const MeshIndex *indices);
 
     GLVertexArray vertexArray;

@@ -47,7 +47,7 @@ public:
     ShaderProgram debugProg;
 
 private:
-    GLShader compileShader(GLConst type, string name,
+    GLShader compileShader(GLShaderType type, string name,
         initializer_list<string> sources);
 
     GLShader basicVert = 0;
@@ -62,8 +62,8 @@ public:
     Texture(GLTexture glTexture);
     ~Texture();
 
-    void setImage(int width, int height, GLConst format, GLConst type,
-                  const void *data);
+    void setImage(int width, int height, GLTextureFormat format,
+                  GLDataType type, const void *data);
 
     GLTexture glTexture;
 };

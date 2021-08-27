@@ -49,23 +49,23 @@ void ShaderProgram::link(string name, initializer_list<GLShader> shaders) {
 
 ShaderManager::ShaderManager()
 {
-    basicVert = compileShader(GL_VERTEX_SHADER, "Vertex",
+    basicVert = compileShader(GLVertexShader, "Vertex",
         {VERSION_DIRECTIVE, vertShaderSrc});
-    GLShader coloredFrag = compileShader(GL_FRAGMENT_SHADER, "Fragment",
+    GLShader coloredFrag = compileShader(GLFragmentShader, "Fragment",
         {VERSION_DIRECTIVE, fragShaderSrc});
-    GLShader texturedFrag = compileShader(GL_FRAGMENT_SHADER, "Fragment",
+    GLShader texturedFrag = compileShader(GLFragmentShader, "Fragment",
         {VERSION_DIRECTIVE,
         "#define BASE_TEXTURE\n",
         fragShaderSrc});
-    GLShader shiftedTextureFrag = compileShader(GL_FRAGMENT_SHADER, "Fragment",
+    GLShader shiftedTextureFrag = compileShader(GLFragmentShader, "Fragment",
         {VERSION_DIRECTIVE,
         "#define BASE_TEXTURE\n#define COLORIZE_SHIFT\n",
         fragShaderSrc});
-    GLShader tintedTextureFrag = compileShader(GL_FRAGMENT_SHADER, "Fragment",
+    GLShader tintedTextureFrag = compileShader(GLFragmentShader, "Fragment",
         {VERSION_DIRECTIVE,
         "#define BASE_TEXTURE\n#define COLORIZE_TINT\n",
         fragShaderSrc});
-    GLShader debugFrag = compileShader(GL_FRAGMENT_SHADER, "Fragment",
+    GLShader debugFrag = compileShader(GLFragmentShader, "Fragment",
         {VERSION_DIRECTIVE, debugFragShaderSrc});
 
     coloredProg.link("Program", {basicVert, coloredFrag});
@@ -81,7 +81,7 @@ ShaderManager::ShaderManager()
     glDeleteShader(debugFrag);
 }
 
-GLShader ShaderManager::compileShader(GLConst type, string name,
+GLShader ShaderManager::compileShader(GLShaderType type, string name,
                                       initializer_list<string> sources)
 {
     GLShader shader = glCreateShader(type);
@@ -120,8 +120,8 @@ Texture::~Texture()
     glDeleteTextures(1, &glTexture);
 }
 
-void Texture::setImage(int width, int height, GLConst format, GLConst type,
-                       const void *data)
+void Texture::setImage(int width, int height, GLTextureFormat format,
+                       GLDataType type, const void *data)
 {
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, glTexture);

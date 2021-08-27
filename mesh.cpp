@@ -33,7 +33,7 @@ RenderPrimitive::RenderPrimitive(RenderPrimitive &&other)
 }
 
 void RenderPrimitive::setAttribData(VertexAttribute attrib, size_t size,
-    int components, GLConst type, const void *data)
+    int components, GLDataType type, const void *data)
 {
     glBindVertexArray(vertexArray);
     glBindBuffer(GL_ARRAY_BUFFER, attribBuffers[attrib]);

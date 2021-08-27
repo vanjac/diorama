@@ -2,7 +2,6 @@
 #include <cstdio>
 #include <exception>
 #include <map>
-#include <GL/gl3w.h>
 #include <glm/gtc/type_ptr.hpp>
 
 #define CHECK(op) (checkError((op), __LINE__))
@@ -292,11 +291,11 @@ Mesh * SkpLoader::loadMesh(SUEntitiesRef entities)
 
         size_t vertexBufferSize = build.vertices.size() * sizeof(glm::vec3);
         primitive.setAttribData(RenderPrimitive::ATTRIB_POSITION,
-            vertexBufferSize, 3, GL_FLOAT, &build.vertices[0]);
+            vertexBufferSize, 3, GLFloat, &build.vertices[0]);
         primitive.setAttribData(RenderPrimitive::ATTRIB_NORMAL,
-            vertexBufferSize, 3, GL_FLOAT, &build.normals[0]);
+            vertexBufferSize, 3, GLFloat, &build.normals[0]);
         primitive.setAttribData(RenderPrimitive::ATTRIB_STQ,
-            vertexBufferSize, 3, GL_FLOAT, &build.stqCoords[0]);
+            vertexBufferSize, 3, GLFloat, &build.stqCoords[0]);
         primitive.setIndices(build.indices.size(), &build.indices[0]);
     }
 
@@ -397,7 +396,7 @@ Texture * SkpLoader::loadTexture(SUTextureRef suTexture)
 
     Texture * texture(new Texture);
     world.addResource(texture);
-    texture->setImage(width, height, GL_RGBA, GL_UNSIGNED_BYTE, colors.get());
+    texture->setImage(width, height, GLRgba, GLUnsignedByte, colors.get());
 
     loadedTextures[fileName] = texture;
     return texture;
