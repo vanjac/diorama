@@ -132,9 +132,12 @@ int Game::main(const vector<string> args)
 
         cameraBlock.ViewMatrix = camTransform.inverse().matrix();
         setCamera(cameraBlock);
+        glm::mat4 cameraMatrix =
+            cameraBlock.ProjectionMatrix * cameraBlock.ViewMatrix;
 
         drawCalls.clear();
-        drawHierarchy(drawCalls, *world.root(), glm::mat4(1), &defaultMaterial);
+        drawHierarchy(drawCalls, *world.root(), cameraMatrix, glm::mat4(1),
+                      &defaultMaterial);
         std::sort(drawCalls.begin(), drawCalls.end());
         render(drawCalls);
 
@@ -194,7 +197,8 @@ void Game::keyUp(const SDL_KeyboardEvent &e)
 
 void Game::drawHierarchy(vector<DrawCall> &drawCalls,
                          const Component &component,
-                         glm::mat4 modelMatrix, const Material *inherit)
+                         glm::mat4 cameraMatrix, glm::mat4 modelMatrix,
+                         const Material *inherit)
 {
     // TODO make this faster, cache values, etc.
     if (component.material)
@@ -219,21 +223,28 @@ void Game::drawHierarchy(vector<DrawCall> &drawCalls,
 // https://extensions.sketchup.com/developers/sketchup_c_api/sketchup/struct_s_u_texture_ref.html#ac9341c5de53bcc1a89e51de463bd54a0
                 !material
             };
-            computeSortKey(&call);
+            computeSortKey(&call, cameraMatrix, modelMatrix);
             drawCalls.push_back(call);
         }
     }
     for (auto &child : component.children()) {
-        drawHierarchy(drawCalls, *child, modelMatrix, inherit);
+        drawHierarchy(drawCalls, *child, cameraMatrix, modelMatrix, inherit);
     }
 }
 
-void Game::computeSortKey(DrawCall *call) {
+void Game::computeSortKey(DrawCall *call,
+                          glm::mat4 cameraMatrix, glm::mat4 modelMatrix) {
     call->sortKey = 0;
     // 30 - 31: render order
     call->sortKey |= (uint32_t)(call->material->order) << 30;
     // 14 - 29: depth
-    // (TODO)
+    if (call->material->order == RenderOrder::Transparent) {
+        // https://community.khronos.org/t/projection-matrix-mapping-the-z/46938
+        glm::vec4 gl_Position = (cameraMatrix * modelMatrix)[3];
+        float depth = glm::clamp(gl_Position.z / gl_Position.w, -1.0f, 1.0f);
+        uint16_t depthInt = (uint16_t)((-depth + 1) / 2 * (float)(1<<16));
+        call->sortKey |= (uint32_t)depthInt << 14;
+    }
     // 8 - 13: shader
     call->sortKey |= (call->material->shader->glProgram & 0x3F) << 8;
     // 0 - 7: material

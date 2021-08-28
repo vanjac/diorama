@@ -8,6 +8,7 @@
 
 namespace diorama {
 
+// https://realtimecollisiondetection.net/blog/?p=86
 // https://blog.molecular-matters.com/2014/11/06/stateless-layered-multi-threaded-rendering-part-1/
 struct DrawCall
 {
@@ -35,8 +36,10 @@ private:
     void keyUp(const SDL_KeyboardEvent &e);
 
     void drawHierarchy(vector<DrawCall> &drawCalls, const Component &component,
-                       glm::mat4 modelMatrix, const Material *inherit);
-    void computeSortKey(DrawCall *call);
+                       glm::mat4 cameraMatrix, glm::mat4 modelMatrix,
+                       const Material *inherit);
+    void computeSortKey(DrawCall *call,
+                        glm::mat4 cameraMatrix, glm::mat4 modelMatrix);
     
     void render(const vector<DrawCall> &drawCalls);
 
