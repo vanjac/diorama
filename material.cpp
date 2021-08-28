@@ -49,30 +49,38 @@ void ShaderProgram::link(string name, initializer_list<GLShader> shaders) {
 
 ShaderManager::ShaderManager()
 {
-    basicVert = compileShader(GLVertexShader, "Vertex",
+    basicVert = compileShader(GLShaderType::VertexShader,
+        "Basic vertex",
         {VERSION_DIRECTIVE, vertShaderSrc});
-    GLShader coloredFrag = compileShader(GLFragmentShader, "Fragment",
+    GLShader coloredFrag = compileShader(GLShaderType::FragmentShader,
+        "Solid color",
         {VERSION_DIRECTIVE, fragShaderSrc});
-    GLShader texturedFrag = compileShader(GLFragmentShader, "Fragment",
+    GLShader texturedFrag = compileShader(GLShaderType::FragmentShader,
+        "Textured",
         {VERSION_DIRECTIVE,
         "#define BASE_TEXTURE\n",
         fragShaderSrc});
-    GLShader shiftedTextureFrag = compileShader(GLFragmentShader, "Fragment",
+    GLShader shiftedTextureFrag = compileShader(GLShaderType::FragmentShader,
+        "Color-shifted texture",
         {VERSION_DIRECTIVE,
         "#define BASE_TEXTURE\n#define COLORIZE_SHIFT\n",
         fragShaderSrc});
-    GLShader tintedTextureFrag = compileShader(GLFragmentShader, "Fragment",
+    GLShader tintedTextureFrag = compileShader(GLShaderType::FragmentShader,
+        "Color-tinted texture",
         {VERSION_DIRECTIVE,
         "#define BASE_TEXTURE\n#define COLORIZE_TINT\n",
         fragShaderSrc});
-    GLShader debugFrag = compileShader(GLFragmentShader, "Fragment",
+    GLShader debugFrag = compileShader(GLShaderType::FragmentShader,
+        "Debug",
         {VERSION_DIRECTIVE, debugFragShaderSrc});
 
-    coloredProg.link("Program", {basicVert, coloredFrag});
-    texturedProg.link("Program", {basicVert, texturedFrag});
-    shiftedTextureProg.link("Program", {basicVert, shiftedTextureFrag});
-    tintedTextureProg.link("Program", {basicVert, tintedTextureFrag});
-    debugProg.link("Program", {basicVert, debugFrag});
+    coloredProg.link("Solid color", {basicVert, coloredFrag});
+    texturedProg.link("Textured", {basicVert, texturedFrag});
+    shiftedTextureProg.link("Color-shifted texture",
+        {basicVert, shiftedTextureFrag});
+    tintedTextureProg.link("Color-tinted texture",
+        {basicVert, tintedTextureFrag});
+    debugProg.link("Debug", {basicVert, debugFrag});
 
     glDeleteShader(coloredFrag);
     glDeleteShader(texturedFrag);
@@ -84,7 +92,7 @@ ShaderManager::ShaderManager()
 GLShader ShaderManager::compileShader(GLShaderType type, string name,
                                       initializer_list<string> sources)
 {
-    GLShader shader = glCreateShader(type);
+    GLShader shader = glCreateShader((GLenum)type);
     vector<const char *> sourcePtrs;
     sourcePtrs.reserve(sources.size());
     for (auto &source : sources)
@@ -127,7 +135,7 @@ void Texture::setImage(int width, int height, GLTextureFormat format,
     glBindTexture(GL_TEXTURE_2D, glTexture);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA,
                  width, height, 0,
-                 format, type, data);
+                 (GLenum)format, (GLenum)type, data);
     glGenerateMipmap(GL_TEXTURE_2D);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,

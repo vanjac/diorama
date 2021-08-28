@@ -17,21 +17,21 @@ using GLUniformLocation = int32_t;
 
 // replacements for GLenum...
 
-enum GLDataType : uint32_t
+enum class GLDataType : uint32_t
 {
-    GLUnsignedByte = 0x1401,
-    GLFloat = 0x1406,
+    UnsignedByte = 0x1401,
+    Float = 0x1406,
 };
 
-enum GLShaderType : uint32_t
+enum class GLShaderType : uint32_t
 {
-    GLVertexShader = 0x8B31,
-    GLFragmentShader = 0x8B30,
+    VertexShader = 0x8B31,
+    FragmentShader = 0x8B30,
 };
 
-enum GLTextureFormat : uint32_t
+enum class GLTextureFormat : uint32_t
 {
-    GLRgba = 0x1908,
+    Rgba = 0x1908,
 };
 
 }  // namespace

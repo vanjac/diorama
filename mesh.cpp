@@ -38,7 +38,8 @@ void RenderPrimitive::setAttribData(VertexAttribute attrib, size_t size,
     glBindVertexArray(vertexArray);
     glBindBuffer(GL_ARRAY_BUFFER, attribBuffers[attrib]);
     glBufferData(GL_ARRAY_BUFFER, size, data, GL_STATIC_DRAW);
-    glVertexAttribPointer(attrib, components, type, GL_FALSE, 0, (void *)0);
+    glVertexAttribPointer(attrib, components, (GLenum)type,
+                          GL_FALSE, 0, (void *)0);
     glEnableVertexAttribArray(attrib);
     glBindVertexArray(0);
 }
