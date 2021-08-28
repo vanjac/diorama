@@ -48,6 +48,7 @@ Renderer::Renderer(const ShaderManager *shaders)
     glVertexAttribPointer(RenderPrimitive::ATTRIB_POSITION, 3, GL_FLOAT,
                           GL_FALSE, 0, (void *)0);
     glEnableVertexAttribArray(RenderPrimitive::ATTRIB_POSITION);
+    glBindVertexArray(0);
 }
 
 void Renderer::setCameraParameters(float fov, float nearClip, float farClip)
@@ -79,6 +80,7 @@ void Renderer::render(const World *world, const Transform &camTransform)
     CameraBlock cameraBlock {viewMatrix, projectionMatrix};
     glBindBuffer(GL_UNIFORM_BUFFER, cameraUBO);
     glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(CameraBlock), &cameraBlock);
+    glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
     drawCalls.clear();
     drawHierarchy(drawCalls, world->root(), cameraMatrix, glm::mat4(1),
@@ -216,6 +218,8 @@ void Renderer::renderDrawCalls(const vector<DrawCall> &drawCalls)
     glCullFace(GL_BACK);
     glDisable(GL_BLEND);
     glDepthMask(GL_TRUE);
+    glUseProgram(0);
+    glBindVertexArray(0);
 }
 
 void Renderer::setTexture(int unit, GLTexture texture)
@@ -246,6 +250,9 @@ void Renderer::debugLine(glm::vec3 start, glm::vec3 end, glm::vec3 color)
     setTransform(debugShader, glm::mat4(1), glm::mat3(1));
 
     glDrawArrays(GL_LINES, 0, 2);
+
+    glUseProgram(0);
+    glBindVertexArray(0);
 }
 
 }  // namespace

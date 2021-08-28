@@ -47,6 +47,8 @@ void ShaderProgram::link(string name, initializer_list<GLShader> shaders) {
     GLUniformLocation baseTextureLoc = glGetUniformLocation(
         glProgram, "BaseTexture");
     glUniform1i(baseTextureLoc, Material::TEXTURE_BASE);
+
+    glUseProgram(0);
 }
 
 ShaderManager::ShaderManager()

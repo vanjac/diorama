@@ -35,6 +35,9 @@ RenderPrimitive::RenderPrimitive(RenderPrimitive &&other)
 void RenderPrimitive::setAttribData(VertexAttribute attrib, size_t size,
     int components, GLDataType type, const void *data)
 {
+    // array buffer bindings are not stored in VAO
+    // https://gamedev.stackexchange.com/a/99238
+    // https://stackoverflow.com/a/26559063
     glBindVertexArray(vertexArray);
     glBindBuffer(GL_ARRAY_BUFFER, attribBuffers[attrib]);
     glBufferData(GL_ARRAY_BUFFER, size, data, GL_STATIC_DRAW);
@@ -47,7 +50,7 @@ void RenderPrimitive::setAttribData(VertexAttribute attrib, size_t size,
 void RenderPrimitive::setIndices(int numIndices, const MeshIndex *indices)
 {
     glBindVertexArray(vertexArray);
-    // binding is stored in VAO
+    // element buffer binding *is* stored in VAO
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementBuffer);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, numIndices * sizeof(MeshIndex),
                  indices, GL_STATIC_DRAW);
