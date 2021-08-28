@@ -75,6 +75,8 @@ int Game::main(const vector<string> args)
                           GL_FALSE, 0, (void *)0);
     glEnableVertexAttribArray(RenderPrimitive::ATTRIB_POSITION);
 
+    vector<DrawCall> drawCalls;
+
     int startTick = SDL_GetTicks();
     int prevTick = 0;
     while (running) {
@@ -125,14 +127,10 @@ int Game::main(const vector<string> args)
         cameraBlock.ViewMatrix = camTransform.inverse().matrix();
         setCamera(cameraBlock);
 
-        renderHierarchy(*world.root(), glm::mat4(1), &defaultMaterial,
-            RenderOrder::Opaque);
-        glEnable(GL_BLEND);
-        glDepthMask(GL_FALSE);
-        renderHierarchy(*world.root(), glm::mat4(1), &defaultMaterial,
-            RenderOrder::Transparent);
-        glDisable(GL_BLEND);
-        glDepthMask(GL_TRUE);
+        drawCalls.clear();
+        drawHierarchy(drawCalls, *world.root(), glm::mat4(1), &defaultMaterial);
+        // TODO sort
+        render(drawCalls);
 
         // TODO  ??
         //glFlush();
@@ -188,8 +186,9 @@ void Game::keyUp(const SDL_KeyboardEvent &e)
 }
 
 
-void Game::renderHierarchy(const Component &component, glm::mat4 modelMatrix,
-                           const Material *inherit, RenderOrder order)
+void Game::drawHierarchy(vector<DrawCall> &drawCalls,
+                         const Component &component,
+                         glm::mat4 modelMatrix, const Material *inherit)
 {
     // TODO make this faster, cache values, etc.
     if (component.material)
@@ -201,37 +200,92 @@ void Game::renderHierarchy(const Component &component, glm::mat4 modelMatrix,
         // detect negative scale https://gamedev.stackexchange.com/a/54508
         // TODO determinant is computed twice
         bool reversed = glm::determinant(model3) < 0;
-        if (reversed)
-            glCullFace(GL_FRONT);
 
         for (auto &primitive : component.mesh->render) {
-            renderPrimitive(primitive, modelMatrix, normalMatrix,
-                            inherit, order);
+            const Material *material = primitive.material;
+            DrawCall call {
+                0,
+                &primitive,
+                material ? material : inherit,
+                modelMatrix,
+                normalMatrix,
+                reversed,
+// https://extensions.sketchup.com/developers/sketchup_c_api/sketchup/struct_s_u_texture_ref.html#ac9341c5de53bcc1a89e51de463bd54a0
+                !material
+            };
+            computeSortKey(&call);
+            drawCalls.push_back(call);
         }
-
-        if (reversed)
-            glCullFace(GL_BACK);
     }
     for (auto &child : component.children()) {
-        renderHierarchy(*child, modelMatrix, inherit, order);
+        drawHierarchy(drawCalls, *child, modelMatrix, inherit);
     }
 }
 
-void Game::renderPrimitive(const RenderPrimitive &primitive,
-                           glm::mat4 modelMatrix, glm::mat3 normalMatrix,
-                           const Material *inherit, RenderOrder order)
-{
-    const Material *mat = primitive.material;
-    if (!mat)
-        mat = inherit;
-    if (mat->order != order)
-        return;
+void Game::computeSortKey(DrawCall *call) {
+    // TODO
+}
 
-    glBindVertexArray(primitive.vertexArray);
-    setMaterial(mat, mat == inherit);
-    setTransform(mat->shader, modelMatrix, normalMatrix);
-    glDrawElements(GL_TRIANGLES, primitive.numIndices,
-                   GL_UNSIGNED_SHORT, (void *)0);
+void Game::render(const vector<DrawCall> &drawCalls)
+{
+    const Material *curMaterial = nullptr;
+    const ShaderProgram *curShader = nullptr;
+    RenderOrder curOrder = RenderOrder::Opaque;
+    bool curReversed = false;
+
+    // init gl state
+    glCullFace(GL_BACK);
+    glDisable(GL_BLEND);
+    glDepthMask(GL_TRUE);
+
+    for (auto &call : drawCalls) {
+        if (call.material != curMaterial) {
+            curMaterial = call.material;
+
+            if (curMaterial->shader != curShader) {
+                curShader = call.material->shader;
+                glUseProgram(curShader->glProgram);
+            }
+
+            setTexture(Material::TEXTURE_BASE, curMaterial->texture->glTexture);
+            glm::vec4 color = curMaterial->color;
+            glUniform4fv(curShader->baseColorLoc, 1, glm::value_ptr(color));
+
+            if (curMaterial->order != curOrder) {
+                curOrder = curMaterial->order;
+                switch (curOrder) {
+                case RenderOrder::Transparent:
+                    glEnable(GL_BLEND);
+                    glDepthMask(GL_FALSE);
+                    break;
+                case RenderOrder::Opaque:
+                    glDisable(GL_BLEND);
+                    glDepthMask(GL_TRUE);
+                    break;
+                }
+            }
+        }
+
+        if (call.reversed != curReversed) {
+            curReversed = call.reversed;
+            glCullFace(curReversed ? GL_FRONT : GL_BACK);
+        }
+
+        // set uniforms
+        setTransform(curShader, call.modelMatrix, call.normalMatrix);
+        glm::vec2 scale = call.noTextureScale ? curMaterial->scale
+            : glm::vec2(1, 1);
+        glUniform2fv(curShader->textureScaleLoc, 1, glm::value_ptr(scale));
+
+        glBindVertexArray(call.primitive->vertexArray);
+        glDrawElements(GL_TRIANGLES, call.primitive->numIndices,
+                       GL_UNSIGNED_SHORT, (void *)0);
+    }
+
+    // reset gl state
+    glCullFace(GL_BACK);
+    glDisable(GL_BLEND);
+    glDepthMask(GL_TRUE);
 }
 
 void Game::setCamera(const CameraBlock &block)
@@ -239,17 +293,6 @@ void Game::setCamera(const CameraBlock &block)
     glBindBuffer(GL_UNIFORM_BUFFER, cameraUBO);
     glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(CameraBlock),
                     &block);
-}
-
-void Game::setMaterial(const Material *material, bool inherited)
-{
-    glUseProgram(material->shader->glProgram);
-    setTexture(Material::TEXTURE_BASE, material->texture->glTexture);
-    glm::vec4 color = material->color;
-    glUniform4fv(material->shader->baseColorLoc, 1, glm::value_ptr(color));
-// https://extensions.sketchup.com/developers/sketchup_c_api/sketchup/struct_s_u_texture_ref.html#ac9341c5de53bcc1a89e51de463bd54a0
-    glm::vec2 scale = inherited ? material->scale : glm::vec2(1, 1);
-    glUniform2fv(material->shader->textureScaleLoc, 1, glm::value_ptr(scale));
 }
 
 void Game::setTexture(int unit, GLTexture texture)

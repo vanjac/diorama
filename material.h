@@ -69,7 +69,7 @@ public:
 
 enum class RenderOrder
 {
-    Opaque, Transparent
+    Opaque, Transparent // TODO add cutout
 };
 
 struct Material : public Resource

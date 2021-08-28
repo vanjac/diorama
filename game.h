@@ -8,6 +8,18 @@
 
 namespace diorama {
 
+// https://blog.molecular-matters.com/2014/11/06/stateless-layered-multi-threaded-rendering-part-1/
+struct DrawCall
+{
+    uint32_t sortKey;
+    const RenderPrimitive *primitive;
+    const Material *material;
+    glm::mat4 modelMatrix;
+    glm::mat3 normalMatrix;
+    bool reversed; // cull front faces instead of back faces
+    bool noTextureScale; // ignore material texture scale
+};
+
 class Game
 {
 public:
@@ -20,13 +32,13 @@ private:
     void keyDown(const SDL_KeyboardEvent &e);
     void keyUp(const SDL_KeyboardEvent &e);
 
-    void renderHierarchy(const Component &component, glm::mat4 modelMatrix,
-        const Material *inherit, RenderOrder order);
-    void renderPrimitive(const RenderPrimitive &primitive,
-        glm::mat4 modelMatrix, glm::mat3 normalMatrix,
-        const Material *inherit, RenderOrder order);
+    void drawHierarchy(vector<DrawCall> &drawCalls, const Component &component,
+                       glm::mat4 modelMatrix, const Material *inherit);
+    void computeSortKey(DrawCall *call);
+    
+    void render(const vector<DrawCall> &drawCalls);
+
     void setCamera(const CameraBlock &block);
-    void setMaterial(const Material *material, bool inherited);
     void setTexture(int unit, GLTexture texture);
     void setTransform(const ShaderProgram *shader,
                       glm::mat4 modelMatrix, glm::mat3 normalMatrix);
