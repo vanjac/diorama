@@ -27,12 +27,14 @@ class Renderer
 public:
     Renderer(const ShaderManager &shaders);
 
-    void resize(int w, int h);
+    void setCameraParameters(float fov, float nearClip, float farClip);
+    void resizeWindow(int w, int h);
     void render(const World *world, const Transform &camTransform);
 
     void debugLine(glm::vec3 start, glm::vec3 end, glm::vec3 color);
 
 private:
+    void updateProjectionMatrix();
 
     void drawHierarchy(vector<DrawCall> &drawCalls, const Component *component,
                        glm::mat4 cameraMatrix, glm::mat4 modelMatrix,
@@ -48,10 +50,15 @@ private:
 
     Material defaultMaterial;
 
-    glm::mat4 projectionMatrix;
-    GLBuffer cameraUBO;  // shared between all programs
+    int windowWidth = 1, windowHeight = 1;
+    float cameraFOV = glm::radians(60.0f);
+    float nearClip = 5;
+    float farClip = 10000;
+    glm::mat4 projectionMatrix {1};
 
     vector<DrawCall> drawCalls;  // avoid reconstructing vector each frame
+
+    GLBuffer cameraUBO;  // shared between all programs
 
     GLVertexArray debugVertexArray;
     GLBuffer debugVertexBuffer;

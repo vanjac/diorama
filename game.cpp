@@ -28,7 +28,7 @@ int Game::main(const vector<string> args)
 
     int winW, winH;
     SDL_GetWindowSize(window, &winW, &winH);
-    renderer.resize(winW, winH);
+    renderer.resizeWindow(winW, winH);
 
     {
         SkpLoader loader(path, &world, shaders);
@@ -43,8 +43,10 @@ int Game::main(const vector<string> args)
         while (SDL_PollEvent(&event)) {
             switch (event.type) {
             case SDL_WINDOWEVENT:
-                if (event.window.event == SDL_WINDOWEVENT_SIZE_CHANGED)
-                    renderer.resize(event.window.data1, event.window.data2);
+                if (event.window.event == SDL_WINDOWEVENT_SIZE_CHANGED) {
+                    renderer.resizeWindow(
+                        event.window.data1, event.window.data2);
+                }
                 break;
             case SDL_KEYDOWN:
                 keyDown(event.key);

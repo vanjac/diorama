@@ -6,11 +6,6 @@
 
 namespace diorama::render {
 
-// TODO move to parameters
-const float PROJ_FOV = glm::radians(60.0f);
-const float PROJ_NEAR = 5;
-const float PROJ_FAR = 10000;
-
 // remap opengl coordinates to blender coordinates
 const glm::mat4 REMAP_AXES(
     glm::vec4(1,0,0,0),
@@ -55,11 +50,26 @@ Renderer::Renderer(const ShaderManager &shaders)
     glEnableVertexAttribArray(RenderPrimitive::ATTRIB_POSITION);
 }
 
-void Renderer::resize(int w, int h)
+void Renderer::setCameraParameters(float fov, float nearClip, float farClip)
 {
+    this->cameraFOV = fov;
+    this->nearClip = nearClip;
+    this->farClip = farClip;
+    updateProjectionMatrix();
+}
+
+void Renderer::resizeWindow(int w, int h)
+{
+    windowWidth = w;
+    windowHeight = h;
     glViewport(0, 0, w, h);
-    projectionMatrix = glm::perspective(
-        PROJ_FOV, (float)w / h, PROJ_NEAR, PROJ_FAR) * REMAP_AXES;
+    updateProjectionMatrix();
+}
+
+void Renderer::updateProjectionMatrix()
+{
+    projectionMatrix = glm::perspective(cameraFOV,
+        (float)windowWidth / windowHeight, nearClip, farClip) * REMAP_AXES;
 }
 
 void Renderer::render(const World *world, const Transform &camTransform)
