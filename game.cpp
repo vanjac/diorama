@@ -2,6 +2,7 @@
 #include "load_skp.h"
 #include <cstdio>
 #include <cstdlib>
+#include <algorithm>
 #include <GL/gl3w.h>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -21,6 +22,11 @@ const glm::mat4 REMAP_AXES(
     glm::vec4(0,0,-1,0),
     glm::vec4(0,1,0,0),
     glm::vec4(0,0,0,1));
+
+bool DrawCall::operator<(const DrawCall &rhs) const
+{
+    return sortKey < rhs.sortKey;
+}
 
 Game::Game(SDL_Window *window)
     : window(window)
@@ -129,7 +135,7 @@ int Game::main(const vector<string> args)
 
         drawCalls.clear();
         drawHierarchy(drawCalls, *world.root(), glm::mat4(1), &defaultMaterial);
-        // TODO sort
+        std::sort(drawCalls.begin(), drawCalls.end());
         render(drawCalls);
 
         // TODO  ??
@@ -223,16 +229,28 @@ void Game::drawHierarchy(vector<DrawCall> &drawCalls,
 }
 
 void Game::computeSortKey(DrawCall *call) {
-    // TODO
+    call->sortKey = 0;
+    // 30 - 31: render order
+    call->sortKey |= (uint32_t)(call->material->order) << 30;
+    // 14 - 29: depth
+    // (TODO)
+    // 8 - 13: shader
+    call->sortKey |= (call->material->shader->glProgram & 0x3F) << 8;
+    // 0 - 7: material
+    // https://stackoverflow.com/q/20953390
+    static const size_t shift = (size_t)log2(1 + sizeof(Material));
+    size_t matPtr = (size_t)call->material;
+    call->sortKey |= ((matPtr >> shift) ^ (matPtr >> (shift + 8))) & 0xFF;
 }
 
 void Game::render(const vector<DrawCall> &drawCalls)
 {
     const Material *curMaterial = nullptr;
     const ShaderProgram *curShader = nullptr;
+
+    // TODO is it actually necessary to avoid gl state changes?
     RenderOrder curOrder = RenderOrder::Opaque;
     bool curReversed = false;
-
     // init gl state
     glCullFace(GL_BACK);
     glDisable(GL_BLEND);

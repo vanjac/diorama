@@ -18,6 +18,8 @@ struct DrawCall
     glm::mat3 normalMatrix;
     bool reversed; // cull front faces instead of back faces
     bool noTextureScale; // ignore material texture scale
+
+    bool operator<(const DrawCall &rhs) const;
 };
 
 class Game
