@@ -48,12 +48,12 @@ int Game::main(const vector<string> args)
     resizeGL(winW, winH);
 
     // https://learnopengl.com/Advanced-OpenGL/Advanced-GLSL
-    glGenBuffers(1, &transformUBO);
-    glBindBuffer(GL_UNIFORM_BUFFER, transformUBO);
+    glGenBuffers(1, &cameraUBO);
+    glBindBuffer(GL_UNIFORM_BUFFER, cameraUBO);
     glBufferData(GL_UNIFORM_BUFFER,
-        sizeof(TransformBlock), &transform, GL_DYNAMIC_DRAW);
+        sizeof(CameraBlock), &cameraBlock, GL_DYNAMIC_DRAW);
     glBindBufferBase(GL_UNIFORM_BUFFER,
-        ShaderProgram::BIND_TRANSFORM, transformUBO);
+        ShaderProgram::BIND_TRANSFORM, cameraUBO);
 
     defaultMaterial.shader = &shaders.coloredProg;
     defaultMaterial.texture = &Texture::NO_TEXTURE;
@@ -122,15 +122,14 @@ int Game::main(const vector<string> args)
         camPos += camTransform.transformVector(flyVec);
         camTransform = Transform::translate(camPos) * camTransform;
 
-        transform.ViewMatrix = camTransform.inverse().matrix();
+        cameraBlock.ViewMatrix = camTransform.inverse().matrix();
+        setCamera(cameraBlock);
 
-        transform.ModelMatrix = glm::mat4(1);
-        renderHierarchy(*world.root(), &defaultMaterial,
+        renderHierarchy(*world.root(), glm::mat4(1), &defaultMaterial,
             RenderOrder::Opaque);
         glEnable(GL_BLEND);
         glDepthMask(GL_FALSE);
-        transform.ModelMatrix = glm::mat4(1);
-        renderHierarchy(*world.root(), &defaultMaterial,
+        renderHierarchy(*world.root(), glm::mat4(1), &defaultMaterial,
             RenderOrder::Transparent);
         glDisable(GL_BLEND);
         glDepthMask(GL_TRUE);
@@ -147,7 +146,7 @@ int Game::main(const vector<string> args)
 void Game::resizeGL(int w, int h)
 {
     glViewport(0, 0, w, h);
-    transform.ProjectionMatrix = glm::perspective(
+    cameraBlock.ProjectionMatrix = glm::perspective(
         PROJ_FOV, (float)w / h, PROJ_NEAR, PROJ_FAR) * REMAP_AXES;
 }
 
@@ -189,40 +188,37 @@ void Game::keyUp(const SDL_KeyboardEvent &e)
 }
 
 
-void Game::renderHierarchy(const Component &component,
+void Game::renderHierarchy(const Component &component, glm::mat4 modelMatrix,
                            const Material *inherit, RenderOrder order)
 {
     // TODO make this faster, cache values, etc.
     if (component.material)
         inherit = component.material;
-    glm::mat4 prevModel = transform.ModelMatrix;
-    transform.ModelMatrix *= component.tLocal().matrix();
+    modelMatrix *= component.tLocal().matrix();
     if (component.mesh && !component.mesh->render.empty()) {
-        glm::mat3 model3 = transform.ModelMatrix;
-        transform.NormalMatrix = glm::transpose(glm::inverse(model3));
+        glm::mat3 model3 = modelMatrix;
+        glm::mat3 normalMatrix = glm::transpose(glm::inverse(model3));
         // detect negative scale https://gamedev.stackexchange.com/a/54508
         // TODO determinant is computed twice
         bool reversed = glm::determinant(model3) < 0;
         if (reversed)
             glCullFace(GL_FRONT);
 
-        // TODO bad to update for every component?
-        setTransform(transform);
-
         for (auto &primitive : component.mesh->render) {
-            renderPrimitive(primitive, inherit, order);
+            renderPrimitive(primitive, modelMatrix, normalMatrix,
+                            inherit, order);
         }
 
         if (reversed)
             glCullFace(GL_BACK);
     }
     for (auto &child : component.children()) {
-        renderHierarchy(*child, inherit, order);
+        renderHierarchy(*child, modelMatrix, inherit, order);
     }
-    transform.ModelMatrix = prevModel;
 }
 
 void Game::renderPrimitive(const RenderPrimitive &primitive,
+                           glm::mat4 modelMatrix, glm::mat3 normalMatrix,
                            const Material *inherit, RenderOrder order)
 {
     const Material *mat = primitive.material;
@@ -233,14 +229,15 @@ void Game::renderPrimitive(const RenderPrimitive &primitive,
 
     glBindVertexArray(primitive.vertexArray);
     setMaterial(mat, mat == inherit);
+    setTransform(mat->shader, modelMatrix, normalMatrix);
     glDrawElements(GL_TRIANGLES, primitive.numIndices,
                    GL_UNSIGNED_SHORT, (void *)0);
 }
 
-void Game::setTransform(const TransformBlock &block)
+void Game::setCamera(const CameraBlock &block)
 {
-    glBindBuffer(GL_UNIFORM_BUFFER, transformUBO);
-    glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(TransformBlock),
+    glBindBuffer(GL_UNIFORM_BUFFER, cameraUBO);
+    glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(CameraBlock),
                     &block);
 }
 
@@ -261,6 +258,15 @@ void Game::setTexture(int unit, GLTexture texture)
     glBindTexture(GL_TEXTURE_2D, texture);
 }
 
+void Game::setTransform(const ShaderProgram *shader,
+                        glm::mat4 modelMatrix, glm::mat3 normalMatrix)
+{
+    glUniformMatrix4fv(shader->modelMatrixLoc, 1, GL_FALSE,
+                       glm::value_ptr(modelMatrix));
+    glUniformMatrix3fv(shader->normalMatrixLoc, 1, GL_FALSE,
+                       glm::value_ptr(normalMatrix));
+}
+
 void Game::debugLine(glm::vec3 start, glm::vec3 end, glm::vec3 color)
 {
     glm::vec3 data[] {start, end};
@@ -271,6 +277,7 @@ void Game::debugLine(glm::vec3 start, glm::vec3 end, glm::vec3 color)
     glUseProgram(shaders.debugProg.glProgram);
     glm::vec4 color4(color, 1);
     glUniform4fv(shaders.debugProg.baseColorLoc, 1, glm::value_ptr(color4));
+    setTransform(&shaders.debugProg, glm::mat4(1), glm::mat3(1));
 
     glDrawArrays(GL_LINES, 0, 2);
 }

@@ -20,13 +20,16 @@ private:
     void keyDown(const SDL_KeyboardEvent &e);
     void keyUp(const SDL_KeyboardEvent &e);
 
-    void renderHierarchy(const Component &component,
+    void renderHierarchy(const Component &component, glm::mat4 modelMatrix,
         const Material *inherit, RenderOrder order);
     void renderPrimitive(const RenderPrimitive &primitive,
+        glm::mat4 modelMatrix, glm::mat3 normalMatrix,
         const Material *inherit, RenderOrder order);
-    void setTransform(const TransformBlock &block);
+    void setCamera(const CameraBlock &block);
     void setMaterial(const Material *material, bool inherited);
     void setTexture(int unit, GLTexture texture);
+    void setTransform(const ShaderProgram *shader,
+                      glm::mat4 modelMatrix, glm::mat3 normalMatrix);
 
     void debugLine(glm::vec3 start, glm::vec3 end, glm::vec3 color);
 
@@ -37,8 +40,8 @@ private:
     ShaderManager shaders;
     Material defaultMaterial;
 
-    TransformBlock transform;
-    GLBuffer transformUBO;  // shared between all programs
+    CameraBlock cameraBlock;
+    GLBuffer cameraUBO;  // shared between all programs
 
     GLVertexArray debugVertexArray;
     GLBuffer debugVertexBuffer;

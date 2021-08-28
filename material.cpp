@@ -34,12 +34,14 @@ void ShaderProgram::link(string name, initializer_list<GLShader> shaders) {
         printf("%s link error: %s", name.c_str(), log.get());
         throw std::exception("Program link error");
     }
-    
+
+    modelMatrixLoc = glGetUniformLocation(glProgram, "ModelMatrix");
+    normalMatrixLoc = glGetUniformLocation(glProgram, "NormalMatrix");
     baseColorLoc = glGetUniformLocation(glProgram, "BaseColor");
     textureScaleLoc = glGetUniformLocation(glProgram, "TextureScale");
 
     glUseProgram(glProgram);
-    GLuint transformIdx = glGetUniformBlockIndex(glProgram, "TransformBlock");
+    GLuint transformIdx = glGetUniformBlockIndex(glProgram, "CameraBlock");
     glUniformBlockBinding(glProgram, transformIdx, BIND_TRANSFORM);
 
     GLUniformLocation baseTextureLoc = glGetUniformLocation(

@@ -8,11 +8,8 @@
 namespace diorama {
 
 // matches interface block in shader
-// TODO: split off Model and Normal?
-struct TransformBlock
+struct CameraBlock
 {
-    glm::mat4 ModelMatrix {1};
-    glm::mat4 NormalMatrix {1};  // actually mat3
     glm::mat4 ViewMatrix {1};
     glm::mat4 ProjectionMatrix {1};
 };
@@ -31,6 +28,8 @@ public:
     void link(string name, initializer_list<GLShader> shaders);
 
     GLProgram glProgram;
+    GLUniformLocation modelMatrixLoc = -1;
+    GLUniformLocation normalMatrixLoc = -1;
     GLUniformLocation baseColorLoc = -1;
     GLUniformLocation textureScaleLoc = -1;
 };

@@ -16,14 +16,16 @@ out vec3 vWorldNormal;
 out vec3 vSTQ;
 
 // std140: predictable layout
-layout (std140) uniform TransformBlock
+// avoid using vec3!
+layout (std140) uniform CameraBlock
 {
-    // avoid using vec3!
-    mat4 ModelMatrix;
-    mat4 NormalMatrix;  // actually mat3
     mat4 ViewMatrix;
     mat4 ProjectionMatrix;
 };
+
+// TODO: should these be in a UBO?
+uniform mat4 ModelMatrix;
+uniform mat3 NormalMatrix;
 
 uniform vec2 TextureScale;
 
