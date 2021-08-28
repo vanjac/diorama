@@ -18,7 +18,7 @@ struct DrawCall
     glm::mat4 modelMatrix;
     glm::mat3 normalMatrix;
     bool reversed; // cull front faces instead of back faces
-    bool noTextureScale; // ignore material texture scale
+    bool textureScale; // apply material texture scale
 
     bool operator<(const DrawCall &rhs) const;
 };

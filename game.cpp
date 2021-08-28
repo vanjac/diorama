@@ -306,8 +306,9 @@ void Game::render(const vector<DrawCall> &drawCalls)
 
         // set uniforms
         setTransform(curShader, call.modelMatrix, call.normalMatrix);
-        glm::vec2 scale = call.noTextureScale ? curMaterial->scale
+        glm::vec2 scale = call.textureScale ? curMaterial->scale
             : glm::vec2(1, 1);
+        // TODO reduce calls? only necessary when texture is set
         glUniform2fv(curShader->textureScaleLoc, 1, glm::value_ptr(scale));
 
         glBindVertexArray(call.primitive->vertexArray);
