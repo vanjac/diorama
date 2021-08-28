@@ -80,9 +80,9 @@ int main(int argc, char *argv[])
     for (int i = 0; i < argc; i++)
         args.emplace_back(argv[i]);
 
-    diorama::Game game(window);
     int result;
     try {
+        diorama::Game game(window);
         result = game.main(args);
     } catch (std::exception e) {
         printf("%s\n", e.what());

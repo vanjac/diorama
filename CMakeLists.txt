@@ -15,6 +15,7 @@ add_executable(diorama
     component.cpp
     world.cpp
     collision.cpp
+    render.cpp
     game.cpp
     load_skp.cpp
     main.cpp
