@@ -242,7 +242,11 @@ void Game::computeSortKey(DrawCall *call, glm::mat4 cameraMatrix) {
         glm::vec4 gl_Position = (cameraMatrix * call->modelMatrix)[3];
         // TODO range seems biased towards high values
         float depth = glm::clamp(gl_Position.z / gl_Position.w, -1.0f, 1.0f);
-        uint16_t depthInt = (uint16_t)((-depth + 1) / 2 * (float)(1<<16));
+        uint16_t depthInt;
+        if (depth >= 1.0f || depth <= -1.0f) // could be behind the camera
+            depthInt = -1;
+        else
+            depthInt = (uint16_t)((-depth + 1) / 2 * (float)(1<<16));
         call->sortKey |= (uint32_t)depthInt << 14;
     }
     // 8 - 13: shader
