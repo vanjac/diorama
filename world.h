@@ -8,7 +8,7 @@ namespace diorama {
 class World {
 public:
     // takes ownership
-    void addResource(Resource *resource);
+    void addResource(const Resource *resource);
 
     Component * root() const;
     // takes ownership
@@ -40,7 +40,7 @@ private:
     void addComponent(Component *component);
     void removeComponent(Component *component);
 
-    vector<unique_ptr<Resource>> _resources;
+    vector<unique_ptr<const Resource>> _resources;
 
     unique_ptr<Component> _root;
 

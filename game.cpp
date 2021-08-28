@@ -65,7 +65,7 @@ int Game::main(const vector<string> args)
     defaultMaterial.texture = &Texture::NO_TEXTURE;
 
     {
-        SkpLoader loader(path, world, shaders);
+        SkpLoader loader(path, &world, shaders);
         loader.loadGlobal();
         world.setRoot(loader.loadRoot());
     }

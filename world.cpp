@@ -3,7 +3,7 @@
 
 namespace diorama {
 
-void World::addResource(Resource *resource)
+void World::addResource(const Resource *resource)
 {
     _resources.emplace_back(resource);
 }

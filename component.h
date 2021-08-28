@@ -20,9 +20,9 @@ public:
     ~Component();
 
     string name;  // shouldn't change after adding to world
-    Mesh *mesh = nullptr;  // could be null
+    const Mesh *mesh = nullptr;  // could be null
     // overrides defaults in mesh and children. null for default
-    Material *material = nullptr;
+    const Material *material = nullptr;
 
     const Transform & tLocal() const;
     Transform & tLocalMut();

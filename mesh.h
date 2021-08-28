@@ -30,7 +30,7 @@ public:
     GLBuffer elementBuffer;  // buffer for element indices
     int numIndices = 0;
 
-    Material *material = nullptr;  // null for default material
+    const Material *material = nullptr;  // null for default material
 };
 
 struct CollisionPrimitive
