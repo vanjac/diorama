@@ -249,13 +249,13 @@ void Game::computeSortKey(DrawCall *call, glm::mat4 cameraMatrix) {
             depthInt = (uint16_t)((-depth + 1) / 2 * (float)(1<<16));
         call->sortKey |= (uint32_t)depthInt << 14;
     }
-    // 8 - 13: shader
-    call->sortKey |= (call->material->shader->glProgram & 0x3F) << 8;
-    // 0 - 7: material
+    // 9 - 13: shader
+    call->sortKey |= (call->material->shader->glProgram & 0x1F) << 9;
+    // 0 - 8: material
     // https://stackoverflow.com/q/20953390
     static const size_t shift = (size_t)log2(1 + sizeof(Material));
     size_t matPtr = (size_t)call->material;
-    call->sortKey |= ((matPtr >> shift) ^ (matPtr >> (shift + 8))) & 0xFF;
+    call->sortKey |= ((matPtr >> shift) ^ (matPtr >> (shift + 9))) & 0x1FF;
 }
 
 void Game::render(const vector<DrawCall> &drawCalls)
