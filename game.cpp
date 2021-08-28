@@ -125,11 +125,13 @@ int Game::main(const vector<string> args)
         transform.ViewMatrix = camTransform.inverse().matrix();
 
         transform.ModelMatrix = glm::mat4(1);
-        renderHierarchy(*world.root(), &defaultMaterial, false);
+        renderHierarchy(*world.root(), &defaultMaterial,
+            RenderOrder::Opaque);
         glEnable(GL_BLEND);
         glDepthMask(GL_FALSE);
         transform.ModelMatrix = glm::mat4(1);
-        renderHierarchy(*world.root(), &defaultMaterial, true);
+        renderHierarchy(*world.root(), &defaultMaterial,
+            RenderOrder::Transparent);
         glDisable(GL_BLEND);
         glDepthMask(GL_TRUE);
 
@@ -188,7 +190,7 @@ void Game::keyUp(const SDL_KeyboardEvent &e)
 
 
 void Game::renderHierarchy(const Component &component,
-                           const Material *inherit, bool transparent)
+                           const Material *inherit, RenderOrder order)
 {
     // TODO make this faster, cache values, etc.
     if (component.material)
@@ -208,25 +210,25 @@ void Game::renderHierarchy(const Component &component,
         setTransform(transform);
 
         for (auto &primitive : component.mesh->render) {
-            renderPrimitive(primitive, inherit, transparent);
+            renderPrimitive(primitive, inherit, order);
         }
 
         if (reversed)
             glCullFace(GL_BACK);
     }
     for (auto &child : component.children()) {
-        renderHierarchy(*child, inherit, transparent);
+        renderHierarchy(*child, inherit, order);
     }
     transform.ModelMatrix = prevModel;
 }
 
 void Game::renderPrimitive(const RenderPrimitive &primitive,
-                           const Material *inherit, bool transparent)
+                           const Material *inherit, RenderOrder order)
 {
     const Material *mat = primitive.material;
     if (!mat)
         mat = inherit;
-    if (mat->transparent != transparent)
+    if (mat->order != order)
         return;
 
     glBindVertexArray(primitive.vertexArray);

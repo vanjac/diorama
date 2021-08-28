@@ -314,9 +314,12 @@ Material * SkpLoader::loadMaterial(SUMaterialRef suMaterial)
     Material * material = new Material;
     world.addResource(material);
 
-    CHECK(SUMaterialIsDrawnTransparent(suMaterial, &material->transparent));
-    if (material->transparent)
+    bool transparent;
+    CHECK(SUMaterialIsDrawnTransparent(suMaterial, &transparent));
+    if (transparent)
         printf("  Material is transparent\n");
+    material->order = transparent ? RenderOrder::Transparent
+        : RenderOrder::Opaque;
 
     SUMaterialType type;
     CHECK(SUMaterialGetType(suMaterial, &type));

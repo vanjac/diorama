@@ -68,6 +68,11 @@ public:
     GLTexture glTexture;
 };
 
+enum class RenderOrder
+{
+    Opaque, Transparent
+};
+
 struct Material : public Resource
 {
     enum TextureUnit
@@ -76,7 +81,7 @@ struct Material : public Resource
     };
 
     const ShaderProgram *shader = nullptr;  // never null
-    bool transparent = false;
+    RenderOrder order = RenderOrder::Opaque;
     const Texture *texture = nullptr;  // never null
     glm::vec4 color {1, 1, 1, 1};
 // https://extensions.sketchup.com/developers/sketchup_c_api/sketchup/struct_s_u_texture_ref.html#ac9341c5de53bcc1a89e51de463bd54a0

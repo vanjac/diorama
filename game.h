@@ -21,9 +21,9 @@ private:
     void keyUp(const SDL_KeyboardEvent &e);
 
     void renderHierarchy(const Component &component,
-        const Material *inherit, bool transparent);
+        const Material *inherit, RenderOrder order);
     void renderPrimitive(const RenderPrimitive &primitive,
-        const Material *inherit, bool transparent);
+        const Material *inherit, RenderOrder order);
     void setTransform(const TransformBlock &block);
     void setMaterial(const Material *material, bool inherited);
     void setTexture(int unit, GLTexture texture);
