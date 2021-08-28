@@ -40,7 +40,6 @@ private:
     void computeSortKey(DrawCall *call, glm::mat4 cameraMatrix);
     void renderDrawCalls(const vector<DrawCall> &drawCalls);
 
-    void setCamera(const CameraBlock &block);
     void setTexture(int unit, GLTexture texture);
     void setTransform(const ShaderProgram *shader,
                       glm::mat4 modelMatrix, glm::mat3 normalMatrix);
@@ -49,7 +48,7 @@ private:
 
     Material defaultMaterial;
 
-    CameraBlock cameraBlock;
+    glm::mat4 projectionMatrix;
     GLBuffer cameraUBO;  // shared between all programs
 
     vector<DrawCall> drawCalls;  // avoid reconstructing vector each frame

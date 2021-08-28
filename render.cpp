@@ -34,9 +34,9 @@ Renderer::Renderer(const ShaderManager &shaders)
     // https://learnopengl.com/Advanced-OpenGL/Advanced-GLSL
     glGenBuffers(1, &cameraUBO);
     glBindBuffer(GL_UNIFORM_BUFFER, cameraUBO);
-    // ProjectionMatrix isn't set yet but that's ok
+    CameraBlock initCameraBlock;
     glBufferData(GL_UNIFORM_BUFFER,
-        sizeof(CameraBlock), &cameraBlock, GL_DYNAMIC_DRAW);
+        sizeof(CameraBlock), &initCameraBlock, GL_DYNAMIC_DRAW);
     glBindBufferBase(GL_UNIFORM_BUFFER,
         ShaderProgram::BIND_TRANSFORM, cameraUBO);
 
@@ -58,28 +58,28 @@ Renderer::Renderer(const ShaderManager &shaders)
 void Renderer::resize(int w, int h)
 {
     glViewport(0, 0, w, h);
-    cameraBlock.ProjectionMatrix = glm::perspective(
+    projectionMatrix = glm::perspective(
         PROJ_FOV, (float)w / h, PROJ_NEAR, PROJ_FAR) * REMAP_AXES;
 }
 
 void Renderer::render(const World *world, const Transform &camTransform)
 {
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-    cameraBlock.ViewMatrix = camTransform.inverse().matrix();
-    setCamera(cameraBlock);
-    glm::mat4 cameraMatrix =
-        cameraBlock.ProjectionMatrix * cameraBlock.ViewMatrix;
+    glm::mat4 viewMatrix = camTransform.inverse().matrix();
+    glm::mat4 cameraMatrix = projectionMatrix * viewMatrix;
+    CameraBlock cameraBlock {viewMatrix, projectionMatrix};
+    glBindBuffer(GL_UNIFORM_BUFFER, cameraUBO);
+    glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(CameraBlock), &cameraBlock);
 
     drawCalls.clear();
     drawHierarchy(drawCalls, world->root(), cameraMatrix, glm::mat4(1),
                     &defaultMaterial);
     std::sort(drawCalls.begin(), drawCalls.end());
+
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     renderDrawCalls(drawCalls);
 
     // TODO glFlush?
 }
-
 
 void Renderer::drawHierarchy(vector<DrawCall> &drawCalls,
                          const Component *component,
@@ -206,13 +206,6 @@ void Renderer::renderDrawCalls(const vector<DrawCall> &drawCalls)
     glCullFace(GL_BACK);
     glDisable(GL_BLEND);
     glDepthMask(GL_TRUE);
-}
-
-void Renderer::setCamera(const CameraBlock &block)
-{
-    glBindBuffer(GL_UNIFORM_BUFFER, cameraUBO);
-    glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(CameraBlock),
-                    &block);
 }
 
 void Renderer::setTexture(int unit, GLTexture texture)
