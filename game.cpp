@@ -223,7 +223,7 @@ void Game::drawHierarchy(vector<DrawCall> &drawCalls,
 // https://extensions.sketchup.com/developers/sketchup_c_api/sketchup/struct_s_u_texture_ref.html#ac9341c5de53bcc1a89e51de463bd54a0
                 !material
             };
-            computeSortKey(&call, cameraMatrix, modelMatrix);
+            computeSortKey(&call, cameraMatrix);
             drawCalls.push_back(call);
         }
     }
@@ -232,15 +232,15 @@ void Game::drawHierarchy(vector<DrawCall> &drawCalls,
     }
 }
 
-void Game::computeSortKey(DrawCall *call,
-                          glm::mat4 cameraMatrix, glm::mat4 modelMatrix) {
+void Game::computeSortKey(DrawCall *call, glm::mat4 cameraMatrix) {
     call->sortKey = 0;
     // 30 - 31: render order
     call->sortKey |= (uint32_t)(call->material->order) << 30;
     // 14 - 29: depth
     if (call->material->order == RenderOrder::Transparent) {
         // https://community.khronos.org/t/projection-matrix-mapping-the-z/46938
-        glm::vec4 gl_Position = (cameraMatrix * modelMatrix)[3];
+        glm::vec4 gl_Position = (cameraMatrix * call->modelMatrix)[3];
+        // TODO range seems biased towards high values
         float depth = glm::clamp(gl_Position.z / gl_Position.w, -1.0f, 1.0f);
         uint16_t depthInt = (uint16_t)((-depth + 1) / 2 * (float)(1<<16));
         call->sortKey |= (uint32_t)depthInt << 14;

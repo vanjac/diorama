@@ -38,8 +38,7 @@ private:
     void drawHierarchy(vector<DrawCall> &drawCalls, const Component &component,
                        glm::mat4 cameraMatrix, glm::mat4 modelMatrix,
                        const Material *inherit);
-    void computeSortKey(DrawCall *call,
-                        glm::mat4 cameraMatrix, glm::mat4 modelMatrix);
+    void computeSortKey(DrawCall *call, glm::mat4 cameraMatrix);
     
     void render(const vector<DrawCall> &drawCalls);
 
