@@ -12,7 +12,7 @@ namespace diorama {
 class SkpLoader
 {
 public:
-    SkpLoader(string path, World *world, const ShaderManager &shaders);
+    SkpLoader(string path, World *world, const ShaderManager *shaders);
     ~SkpLoader();
 
     // call before loading anything else
@@ -48,7 +48,7 @@ private:
 
     SUModelRef model = SU_INVALID;
     World *world;
-    const ShaderManager &shaders;
+    const ShaderManager *shaders;
 
     // maps file name to texture
     // file name seems to be the only way to identify shared ImageReps, but this

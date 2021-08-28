@@ -11,7 +11,7 @@ const float FLY_SPEED_ADJUST = 0.2f;
 
 Game::Game(SDL_Window *window)
     : window(window)
-    , renderer(shaders)
+    , renderer(&shaders)
 {}
 
 int Game::main(const vector<string> args)
@@ -31,7 +31,7 @@ int Game::main(const vector<string> args)
     renderer.resizeWindow(winW, winH);
 
     {
-        SkpLoader loader(path, &world, shaders);
+        SkpLoader loader(path, &world, &shaders);
         loader.loadGlobal();
         world.setRoot(loader.loadRoot());
     }

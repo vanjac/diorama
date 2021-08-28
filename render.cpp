@@ -18,8 +18,7 @@ bool DrawCall::operator<(const DrawCall &rhs) const
     return sortKey < rhs.sortKey;
 }
 
-Renderer::Renderer(const ShaderManager &shaders)
-    : shaders(shaders)
+Renderer::Renderer(const ShaderManager *shaders)
 {
     glClearColor(0, 0, 0, 1);
     glEnable(GL_CULL_FACE);
@@ -35,8 +34,9 @@ Renderer::Renderer(const ShaderManager &shaders)
     glBindBufferBase(GL_UNIFORM_BUFFER,
         ShaderProgram::BIND_TRANSFORM, cameraUBO);
 
-    defaultMaterial.shader = &shaders.coloredProg;
+    defaultMaterial.shader = &shaders->coloredProg;
     defaultMaterial.texture = &Texture::NO_TEXTURE;
+    debugShader = &shaders->debugProg;
 
     glGenVertexArrays(1, &debugVertexArray);
     glBindVertexArray(debugVertexArray);
@@ -240,10 +240,10 @@ void Renderer::debugLine(glm::vec3 start, glm::vec3 end, glm::vec3 color)
     glBindBuffer(GL_ARRAY_BUFFER, debugVertexBuffer);
     glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(data), data);
 
-    glUseProgram(shaders.debugProg.glProgram);
+    glUseProgram(debugShader->glProgram);
     glm::vec4 color4(color, 1);
-    glUniform4fv(shaders.debugProg.baseColorLoc, 1, glm::value_ptr(color4));
-    setTransform(&shaders.debugProg, glm::mat4(1), glm::mat3(1));
+    glUniform4fv(debugShader->baseColorLoc, 1, glm::value_ptr(color4));
+    setTransform(debugShader, glm::mat4(1), glm::mat3(1));
 
     glDrawArrays(GL_LINES, 0, 2);
 }

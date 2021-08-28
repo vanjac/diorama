@@ -25,7 +25,7 @@ struct DrawCall
 class Renderer
 {
 public:
-    Renderer(const ShaderManager &shaders);
+    Renderer(const ShaderManager *shaders);
 
     void setCameraParameters(float fov, float nearClip, float farClip);
     void resizeWindow(int w, int h);
@@ -46,9 +46,8 @@ private:
     void setTransform(const ShaderProgram *shader,
                       glm::mat4 modelMatrix, glm::mat3 normalMatrix);
 
-    const ShaderManager &shaders;
-
     Material defaultMaterial;
+    const ShaderProgram *debugShader;
 
     int windowWidth = 1, windowHeight = 1;
     float cameraFOV = glm::radians(60.0f);
