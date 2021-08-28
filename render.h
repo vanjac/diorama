@@ -27,6 +27,8 @@ class Renderer
 public:
     Renderer(const ShaderManager *shaders);
 
+    void initGL();
+
     void setCameraParameters(float fov, float nearClip, float farClip);
     void resizeWindow(int w, int h);
     void render(const World *world, const Transform &camTransform);

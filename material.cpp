@@ -51,7 +51,7 @@ void ShaderProgram::link(string name, initializer_list<GLShader> shaders) {
     glUseProgram(0);
 }
 
-ShaderManager::ShaderManager()
+void ShaderManager::linkPrograms()
 {
     basicVert = compileShader(GLShaderType::VertexShader,
         "Basic vertex",

@@ -37,13 +37,13 @@ public:
 class ShaderManager
 {
 public:
-    ShaderManager();
-
     ShaderProgram coloredProg;
     ShaderProgram texturedProg;
     ShaderProgram shiftedTextureProg;
     ShaderProgram tintedTextureProg;
     ShaderProgram debugProg;
+
+    void linkPrograms();
 
 private:
     GLShader compileShader(GLShaderType type, string name,

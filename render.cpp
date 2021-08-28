@@ -19,6 +19,13 @@ bool DrawCall::operator<(const DrawCall &rhs) const
 }
 
 Renderer::Renderer(const ShaderManager *shaders)
+    : debugShader(&shaders->debugProg)
+{
+    defaultMaterial.shader = &shaders->coloredProg;
+    defaultMaterial.texture = &Texture::NO_TEXTURE;
+}
+
+void Renderer::initGL()
 {
     glClearColor(0, 0, 0, 1);
     glEnable(GL_CULL_FACE);
@@ -33,10 +40,6 @@ Renderer::Renderer(const ShaderManager *shaders)
         sizeof(CameraBlock), &initCameraBlock, GL_DYNAMIC_DRAW);
     glBindBufferBase(GL_UNIFORM_BUFFER,
         ShaderProgram::BIND_TRANSFORM, cameraUBO);
-
-    defaultMaterial.shader = &shaders->coloredProg;
-    defaultMaterial.texture = &Texture::NO_TEXTURE;
-    debugShader = &shaders->debugProg;
 
     glGenVertexArrays(1, &debugVertexArray);
     glBindVertexArray(debugVertexArray);

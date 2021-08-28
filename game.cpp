@@ -26,6 +26,9 @@ int Game::main(const vector<string> args)
         return EXIT_FAILURE;
     }
 
+    renderer.initGL();
+    shaders.linkPrograms();  // after initial OpenGL state is set
+
     int winW, winH;
     SDL_GetWindowSize(window, &winW, &winH);
     renderer.resizeWindow(winW, winH);
