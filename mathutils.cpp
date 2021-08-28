@@ -91,12 +91,12 @@ glm::vec3 Transform::down() const
     return -glm::vec3(mat[2]);
 }
 
-glm::vec3 Transform::transformVector(glm::vec3 v) const
+glm::vec3 Transform::transformVector(const glm::vec3 &v) const
 {
     return mat * glm::vec4(v, 0);
 }
 
-glm::vec3 Transform::transformPoint(glm::vec3 v) const
+glm::vec3 Transform::transformPoint(const glm::vec3 &v) const
 {
     return mat * glm::vec4(v, 1);
 }

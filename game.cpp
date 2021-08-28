@@ -136,7 +136,7 @@ int Game::main(const vector<string> args)
             cameraBlock.ProjectionMatrix * cameraBlock.ViewMatrix;
 
         drawCalls.clear();
-        drawHierarchy(drawCalls, *world.root(), cameraMatrix, glm::mat4(1),
+        drawHierarchy(drawCalls, world.root(), cameraMatrix, glm::mat4(1),
                       &defaultMaterial);
         std::sort(drawCalls.begin(), drawCalls.end());
         render(drawCalls);
@@ -196,22 +196,22 @@ void Game::keyUp(const SDL_KeyboardEvent &e)
 
 
 void Game::drawHierarchy(vector<DrawCall> &drawCalls,
-                         const Component &component,
+                         const Component *component,
                          glm::mat4 cameraMatrix, glm::mat4 modelMatrix,
                          const Material *inherit)
 {
     // TODO make this faster, cache values, etc.
-    if (component.material)
-        inherit = component.material;
-    modelMatrix *= component.tLocal().matrix();
-    if (component.mesh && !component.mesh->render.empty()) {
+    if (component->material)
+        inherit = component->material;
+    modelMatrix *= component->tLocal().matrix();
+    if (component->mesh && !component->mesh->render.empty()) {
         glm::mat3 model3 = modelMatrix;
         glm::mat3 normalMatrix = glm::transpose(glm::inverse(model3));
         // detect negative scale https://gamedev.stackexchange.com/a/54508
         // TODO determinant is computed twice
         bool reversed = glm::determinant(model3) < 0;
 
-        for (auto &primitive : component.mesh->render) {
+        for (auto &primitive : component->mesh->render) {
             const Material *material = primitive.material;
             DrawCall call {
                 0,
@@ -227,8 +227,8 @@ void Game::drawHierarchy(vector<DrawCall> &drawCalls,
             drawCalls.push_back(call);
         }
     }
-    for (auto &child : component.children()) {
-        drawHierarchy(drawCalls, *child, cameraMatrix, modelMatrix, inherit);
+    for (auto &child : component->children()) {
+        drawHierarchy(drawCalls, child, cameraMatrix, modelMatrix, inherit);
     }
 }
 

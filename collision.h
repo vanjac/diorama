@@ -14,6 +14,6 @@ struct CollisionInfo
     // TODO substance
 };
 
-CollisionInfo raycast(const World &world, glm::vec3 origin, glm::vec3 dir);
+CollisionInfo raycast(const World *world, glm::vec3 origin, glm::vec3 dir);
 
 }  // namespace

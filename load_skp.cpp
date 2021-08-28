@@ -97,14 +97,14 @@ void SkpLoader::loadGlobal()
 
         SUStringRef nameStr = createString();
         CHECK(SUComponentDefinitionGetName(defPair.second, &nameStr));
-        component->name = convertStringAndRelease(nameStr);
+        component->name = convertStringAndRelease(&nameStr);
         printf("Definition %d: %s\n",
             defPair.first, component->name.c_str());
 
         SUEntitiesRef entities = SU_INVALID;
         CHECK(SUComponentDefinitionGetEntities(defPair.second, &entities));
         // component definitions don't seem to use materials
-        loadEntities(entities, *component);
+        loadEntities(entities, component);
         int32_t id = getID(SUComponentDefinitionToEntity(defPair.second));
         componentDefinitions[id] = unique_ptr<Component>(component);
     }
@@ -117,13 +117,13 @@ Component * SkpLoader::loadRoot()
     SUEntitiesRef entities = SU_INVALID;
     CHECK(SUModelGetEntities(model, &entities));
     printf("Model:\n");
-    loadEntities(entities, *root);
+    loadEntities(entities, root);
     return root;
 }
 
-void SkpLoader::loadEntities(SUEntitiesRef entities, Component &component)
+void SkpLoader::loadEntities(SUEntitiesRef entities, Component *component)
 {
-    component.mesh = loadMesh(entities);
+    component->mesh = loadMesh(entities);
 
     size_t numGroups;
     CHECK(SUEntitiesGetNumGroups(entities, &numGroups));
@@ -131,7 +131,7 @@ void SkpLoader::loadEntities(SUEntitiesRef entities, Component &component)
     CHECK(SUEntitiesGetGroups(entities, numGroups, groups.get(), &numGroups));
     for (int i = 0; i < numGroups; i++) {
         SUComponentInstanceRef instance = SUGroupToComponentInstance(groups[i]);
-        loadInstance(instance)->setParent(&component);
+        loadInstance(instance)->setParent(component);
     }
 
     size_t numInstances;
@@ -142,7 +142,7 @@ void SkpLoader::loadEntities(SUEntitiesRef entities, Component &component)
         instances.get(), &numInstances));
     for (int i = 0; i < numInstances; i++) {
         SUComponentInstanceRef instance = instances[i];
-        loadInstance(instance)->setParent(&component);
+        loadInstance(instance)->setParent(component);
     }
 
     size_t numImages;
@@ -157,7 +157,7 @@ void SkpLoader::loadEntities(SUEntitiesRef entities, Component &component)
             printf("  Image instance %d not found!\n", imageID);
             continue;
         }
-        loadInstance(instIt->second)->setParent(&component);
+        loadInstance(instIt->second)->setParent(component);
     }
 }
 
@@ -176,7 +176,7 @@ Component * SkpLoader::loadInstance(SUComponentInstanceRef instance)
 
     SUStringRef nameStr = createString();
     CHECK(SUComponentInstanceGetName(instance, &nameStr));
-    string name = convertStringAndRelease(nameStr);
+    string name = convertStringAndRelease(&nameStr);
     printf("  Instance %s of %d\n", name.c_str(),
         definitionID);
     // instances with empty names use the name of their definition
@@ -307,7 +307,7 @@ Material * SkpLoader::loadMaterial(SUMaterialRef suMaterial)
 {
     SUStringRef nameStr = createString();
     CHECK(SUMaterialGetName(suMaterial, &nameStr));
-    string name = convertStringAndRelease(nameStr);
+    string name = convertStringAndRelease(&nameStr);
     printf("Material %d: %s\n", getID(SUMaterialToEntity(suMaterial)),
         name.c_str());
 
@@ -375,7 +375,7 @@ Texture * SkpLoader::loadTexture(SUTextureRef suTexture)
 {
     SUStringRef fileNameStr = createString();
     CHECK(SUTextureGetFileName(suTexture, &fileNameStr));
-    string fileName = convertStringAndRelease(fileNameStr);
+    string fileName = convertStringAndRelease(&fileNameStr);
 
     auto texIt = loadedTextures.find(fileName);
     if (texIt != loadedTextures.end()) {
@@ -421,13 +421,13 @@ SUStringRef SkpLoader::createString()
     return str;
 }
 
-string SkpLoader::convertStringAndRelease(SUStringRef &suStr)
+string SkpLoader::convertStringAndRelease(SUStringRef *suStr)
 {
     size_t len = 0;
-    CHECK(SUStringGetUTF8Length(suStr, &len));
+    CHECK(SUStringGetUTF8Length(*suStr, &len));
     unique_ptr<char[]> utf8(new char[len + 1]);
-    CHECK(SUStringGetUTF8(suStr, len + 1, utf8.get(), &len));
-    CHECK(SUStringRelease(&suStr));
+    CHECK(SUStringGetUTF8(*suStr, len + 1, utf8.get(), &len));
+    CHECK(SUStringRelease(suStr));
     string stdStr(utf8.get());
     return stdStr;
 }

@@ -21,7 +21,7 @@ public:
 
 private:
     // return null for no mesh
-    void loadEntities(SUEntitiesRef entities, Component &component);
+    void loadEntities(SUEntitiesRef entities, Component *component);
     Component * loadInstance(SUComponentInstanceRef instance);
     Mesh * loadMesh(SUEntitiesRef entities);
     Material * loadMaterial(SUMaterialRef suMaterial);
@@ -30,7 +30,7 @@ private:
     // utils
     int32_t getID(SUEntityRef entity);
     SUStringRef createString();
-    string convertStringAndRelease(SUStringRef &suStr);
+    string convertStringAndRelease(SUStringRef *suStr);
     glm::vec4 colorToVec(SUColor color);
     SUResult checkError(SUResult result, int line);
 

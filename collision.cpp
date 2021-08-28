@@ -5,24 +5,24 @@
 namespace diorama::physics {
 
 static CollisionInfo raycastHierarchy(
-    Component &component, glm::vec3 origin, glm::vec3 dir);
+    Component *component, glm::vec3 origin, glm::vec3 dir);
 // dir must be a unit vector
 static CollisionInfo raycastPrimitive(
-    Component &component, const CollisionPrimitive &primitive,
+    Component *component, const CollisionPrimitive *primitive,
     glm::vec3 origin, glm::vec3 dir, float *closestDist2);
 
-CollisionInfo raycast(const World &world, glm::vec3 origin, glm::vec3 dir)
+CollisionInfo raycast(const World *world, glm::vec3 origin, glm::vec3 dir)
 {
-    CollisionInfo collision = raycastHierarchy(*world.root(), origin, dir);
+    CollisionInfo collision = raycastHierarchy(world->root(), origin, dir);
     if (collision.component)
         collision.normal = glm::normalize(collision.normal);
     return collision;
 }
 
 static CollisionInfo raycastHierarchy(
-    Component &component, glm::vec3 origin, glm::vec3 dir)
+    Component *component, glm::vec3 origin, glm::vec3 dir)
 {
-    const Transform &t = component.tLocal();
+    const Transform &t = component->tLocal();
     Transform invT = t.inverse();
     origin = invT.transformPoint(origin);
     dir = invT.transformVector(dir);  // TODO preserve length
@@ -30,8 +30,8 @@ static CollisionInfo raycastHierarchy(
     float closestDist2 = std::numeric_limits<float>::max();
     CollisionInfo closest;
 
-    for (auto &child : component.children()) {
-        auto collision = raycastHierarchy(*child, origin, dir);
+    for (auto &child : component->children()) {
+        auto collision = raycastHierarchy(child, origin, dir);
         if (collision.component) {
             float dist2 = glm::distance2(origin, collision.point);
             if (dist2 < closestDist2) {
@@ -40,12 +40,12 @@ static CollisionInfo raycastHierarchy(
             }
         }
     }
-    if (component.mesh && !component.mesh->collision.empty()) {
+    if (component->mesh && !component->mesh->collision.empty()) {
         // dir may not be a unit vector at this point
         dir = glm::normalize(dir);
-        for (auto &primitive : component.mesh->collision) {
-            auto collision = raycastPrimitive(component, primitive, origin, dir,
-                                              &closestDist2);
+        for (auto &primitive : component->mesh->collision) {
+            auto collision = raycastPrimitive(
+                component, &primitive, origin, dir, &closestDist2);
             if (collision.component) {
                 closest = collision;
             }
@@ -61,15 +61,15 @@ static CollisionInfo raycastHierarchy(
 }
 
 static CollisionInfo raycastPrimitive(
-    Component &component, const CollisionPrimitive &primitive,
+    Component *component, const CollisionPrimitive *primitive,
     glm::vec3 origin, glm::vec3 dir, float *closestDist2)
 {
     CollisionInfo closest;
 
-    for (int i = 0; i < primitive.indices.size(); i += 3) {
-        glm::vec3 a = primitive.vertices[primitive.indices[i]];
-        glm::vec3 b = primitive.vertices[primitive.indices[i + 1]];
-        glm::vec3 c = primitive.vertices[primitive.indices[i + 2]];
+    for (int i = 0; i < primitive->indices.size(); i += 3) {
+        glm::vec3 a = primitive->vertices[primitive->indices[i]];
+        glm::vec3 b = primitive->vertices[primitive->indices[i + 1]];
+        glm::vec3 c = primitive->vertices[primitive->indices[i + 2]];
 
         // triangle plane normal and coefficient
         glm::vec3 triCross = glm::cross(b - a, c - a);
@@ -97,7 +97,7 @@ static CollisionInfo raycastPrimitive(
         if (dAreaQBC < 0 || dAreaAQC < 0 || dAreaABQ < 0)
             continue;  // not inside triangle
 
-        closest.component = &component;
+        closest.component = component;
         closest.point = intersect;
         closest.normal = planeNormal;
         *closestDist2 = t*t;

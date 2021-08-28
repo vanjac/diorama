@@ -35,7 +35,7 @@ private:
     void keyDown(const SDL_KeyboardEvent &e);
     void keyUp(const SDL_KeyboardEvent &e);
 
-    void drawHierarchy(vector<DrawCall> &drawCalls, const Component &component,
+    void drawHierarchy(vector<DrawCall> &drawCalls, const Component *component,
                        glm::mat4 cameraMatrix, glm::mat4 modelMatrix,
                        const Material *inherit);
     void computeSortKey(DrawCall *call, glm::mat4 cameraMatrix);

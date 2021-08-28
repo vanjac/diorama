@@ -36,8 +36,8 @@ public:
     glm::vec3 up() const;
     glm::vec3 down() const;
 
-    glm::vec3 transformVector(glm::vec3 v) const;
-    glm::vec3 transformPoint(glm::vec3 p) const;
+    glm::vec3 transformVector(const glm::vec3 &v) const;
+    glm::vec3 transformPoint(const glm::vec3 &p) const;
 
 private:
     glm::mat4 mat;
