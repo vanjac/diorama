@@ -16,7 +16,7 @@ struct PrimitiveBuilder {
     vector<MeshIndex> indices;
 };
 
-SkpLoader::SkpLoader(string path, World &world, ShaderManager &shaders)
+SkpLoader::SkpLoader(string path, World *world, const ShaderManager &shaders)
     : world(world)
     , shaders(shaders)
 {
@@ -214,7 +214,7 @@ Mesh * SkpLoader::loadMesh(SUEntitiesRef entities)
     CHECK(SUEntitiesGetFaces(entities, numFaces, faces.get(), &numFaces));
 
     Mesh * mesh = new Mesh;
-    world.addResource(mesh);
+    world->addResource(mesh);
 
     // maps material ID to builder
     unordered_map<int32_t, PrimitiveBuilder> materialPrimitives;
@@ -312,7 +312,7 @@ Material * SkpLoader::loadMaterial(SUMaterialRef suMaterial)
         name.c_str());
 
     Material * material = new Material;
-    world.addResource(material);
+    world->addResource(material);
 
     bool transparent;
     CHECK(SUMaterialIsDrawnTransparent(suMaterial, &transparent));
@@ -398,7 +398,7 @@ Texture * SkpLoader::loadTexture(SUTextureRef suTexture)
     CHECK(SUImageRepRelease(&image));
 
     Texture * texture(new Texture);
-    world.addResource(texture);
+    world->addResource(texture);
     texture->setImage(width, height, GLTextureFormat::Rgba,
                       GLDataType::UnsignedByte, colors.get());
 
