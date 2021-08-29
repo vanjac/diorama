@@ -29,6 +29,7 @@ public:
 
     Component * parent() const;
     // parent takes ownership of child
+    // if parent is null, caller is expected to take ownership
     void setParent(Component *parent);
     const vector<Component *> children() const;
 
