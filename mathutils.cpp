@@ -56,7 +56,7 @@ Transform Transform::inverse() const
     return glm::inverse(mat);
 }
 
-glm::vec3 Transform::position() const
+glm::vec3 Transform::origin() const
 {
     return glm::vec3(mat[3]);
 }

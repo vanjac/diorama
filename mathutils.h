@@ -27,7 +27,7 @@ public:
     Transform & operator*=(const Transform &rhs);
     Transform inverse() const;
 
-    glm::vec3 position() const;
+    glm::vec3 origin() const;
     // these are NOT normalized
     glm::vec3 right() const;
     glm::vec3 left() const;
