@@ -16,4 +16,7 @@ struct CollisionInfo
 
 CollisionInfo raycast(const World *world, glm::vec3 origin, glm::vec3 dir);
 
+void sphereCollision(const World *world, glm::vec3 center, float radius,
+                     vector<CollisionInfo> &collisions);
+
 }  // namespace
