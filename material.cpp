@@ -128,7 +128,9 @@ Texture::Texture(GLTexture glTexture)
 
 Texture::~Texture()
 {
-    glDeleteTextures(1, &glTexture);
+    if (glTexture != 0) {
+        glDeleteTextures(1, &glTexture);
+    }
 }
 
 void Texture::setImage(int width, int height, GLTextureFormat format,
