@@ -1,6 +1,6 @@
 #include "game.h"
 #include "load_skp.h"
-#include <cstdlib>
+#include <exception>
 #include <glm/gtc/matrix_transform.hpp>
 
 namespace diorama {
@@ -13,16 +13,15 @@ Game::Game(SDL_Window *window)
     , renderer(&shaders)
 {}
 
-int Game::main(const vector<string> args)
+void Game::main(const vector<string> args)
 {
     if (args.size() < 2) {
-        cout << "please specify a path\n";
-        return EXIT_FAILURE;
+        throw std::exception("Please specify a map file");
     }
     string path = args[1];
     if (path.compare(path.length() - 4, 4, ".skb") == 0) {
-        cout << "that's a backup file! look for .skp extension instead\n";
-        return EXIT_FAILURE;
+        throw std::exception(
+            "That's a backup file! Look for .skp extension instead.");
     }
 
     renderer.initGL();
@@ -89,8 +88,6 @@ int Game::main(const vector<string> args)
 
         SDL_GL_SwapWindow(window);
     }
-
-    return EXIT_SUCCESS;
 }
 
 void Game::keyDown(const SDL_KeyboardEvent &e)

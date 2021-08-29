@@ -34,7 +34,8 @@ int main(int argc, char *argv[])
         800, 600,
         SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);  // TODO highdpi?
     if (!window) {
-        cout << "couldn't create window! " <<SDL_GetError()<< "\n";
+        SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "SDL Error",
+                                 SDL_GetError(), nullptr);
         SDL_Quit();
         return EXIT_FAILURE;
     }
@@ -50,14 +51,16 @@ int main(int argc, char *argv[])
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
     SDL_GLContext gl_context = SDL_GL_CreateContext(window);
     if (!gl_context) {
-        cout << "Couldn't create OpenGL context: " <<SDL_GetError()<< "\n";
+        SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "SDL OpenGL Error",
+                                 SDL_GetError(), window);
         SDL_Quit();
-        return 1;
+        return EXIT_FAILURE;
     }
     SDL_GL_SetSwapInterval(1);  // enable vsync
 
     if (gl3wInit()) {
-        cout << "error initializing OpenGL\n";
+        SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "gl3w Error",
+                                 "Error initializing OpenGL", window);
         SDL_Quit();
         return EXIT_FAILURE;
     }
@@ -80,12 +83,13 @@ int main(int argc, char *argv[])
     for (int i = 0; i < argc; i++)
         args.emplace_back(argv[i]);
 
-    int result;
+    int result = EXIT_SUCCESS;
     try {
         diorama::Game game(window);
-        result = game.main(args);
+        game.main(args);
     } catch (std::exception e) {
-        cout <<e.what()<< "\n";
+        SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error running game",
+                                 e.what(), window);
         result = EXIT_FAILURE;
     }
 

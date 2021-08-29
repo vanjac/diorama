@@ -12,7 +12,7 @@ class Game
 {
 public:
     Game(SDL_Window *window);
-    int main(const vector<string> args);
+    void main(const vector<string> args);
 
 private:
     void keyDown(const SDL_KeyboardEvent &e);
