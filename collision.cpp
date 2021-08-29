@@ -162,6 +162,8 @@ static void spherePrimitive(
         float planeK = glm::dot(planeNorm, a);
 
         float distToPlane = glm::dot(planeNorm, center) - planeK;
+        if (distToPlane < 0)  // wrong side
+            continue;
         glm::vec3 planePt = center - distToPlane * planeNorm;  // point on plane
 
         // check if inside each edge
