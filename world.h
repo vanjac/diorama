@@ -2,6 +2,7 @@
 #include "common.h"
 
 #include "component.h"
+#include <unordered_map>
 
 namespace diorama {
 
@@ -45,7 +46,7 @@ private:
     unique_ptr<Component> _root;
 
     // map component name to list of components with that name
-    unordered_map<string, vector<Component *>> names;
+    std::unordered_map<string, vector<Component *>> names;
 };
 
 

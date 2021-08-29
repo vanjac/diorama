@@ -5,6 +5,7 @@
 #include "material.h"
 #include "mesh.h"
 #include "world.h"
+#include <unordered_map>
 #include <SketchUpAPI/sketchup.h>
 
 namespace diorama {
@@ -53,14 +54,14 @@ private:
     // maps file name to texture
     // file name seems to be the only way to identify shared ImageReps, but this
     // can cause conflicts
-    unordered_map<string, Texture *> loadedTextures;
+    std::unordered_map<string, Texture *> loadedTextures;
     // maps SU material ID to material (not persistent ID!)
-    unordered_map<int32_t, Material *> loadedMaterials;
+    std::unordered_map<int32_t, Material *> loadedMaterials;
     // maps SU definition ID to component hierarchy
-    unordered_map<int32_t, unique_ptr<Component>> componentDefinitions;
+    std::unordered_map<int32_t, unique_ptr<Component>> componentDefinitions;
     // maps image instance ID to ComponentInstance
     // because we can't cast Image to ComponentInstance for some reason :(
-    unordered_map<int32_t, SUComponentInstanceRef> imageInstances;
+    std::unordered_map<int32_t, SUComponentInstanceRef> imageInstances;
 };
 
 }  // namespace

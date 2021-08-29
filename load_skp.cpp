@@ -215,7 +215,7 @@ Mesh * SkpLoader::loadMesh(SUEntitiesRef entities)
     world->addResource(mesh);
 
     // maps material ID to builder
-    unordered_map<int32_t, PrimitiveBuilder> materialPrimitives;
+    std::unordered_map<int32_t, PrimitiveBuilder> materialPrimitives;
     mesh->collision.emplace_back();
     CollisionPrimitive &collision = mesh->collision.back();
 
