@@ -1,9 +1,9 @@
 #pragma once
 #include "common.h"
 
+#include "material.h"
 #include "mathutils.h"
 #include "mesh.h"
-#include "material.h"
 
 namespace diorama {
 

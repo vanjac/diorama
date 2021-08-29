@@ -1,9 +1,9 @@
-#include <SDL.h>
-#include <GL/gl3w.h>
-#include <cstdlib>
-#include <cstdio>
-#include <exception>
 #include "game.h"
+#include <cstdio>
+#include <cstdlib>
+#include <exception>
+#include <GL/gl3w.h>
+#include <SDL.h>
 
 #define OPENGL_DEBUG
 

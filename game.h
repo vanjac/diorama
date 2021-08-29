@@ -1,10 +1,10 @@
 #pragma once
 #include "common.h"
 
-#include <SDL.h>
-#include <glm/glm.hpp>
-#include "world.h"
 #include "render.h"
+#include "world.h"
+#include <glm/glm.hpp>
+#include <SDL.h>
 
 namespace diorama {
 

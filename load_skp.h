@@ -1,11 +1,11 @@
 #pragma once
 #include "common.h"
 
-#include <SketchUpAPI/sketchup.h>
-#include "mesh.h"
-#include "material.h"
 #include "component.h"
+#include "material.h"
+#include "mesh.h"
 #include "world.h"
+#include <SketchUpAPI/sketchup.h>
 
 namespace diorama {
 

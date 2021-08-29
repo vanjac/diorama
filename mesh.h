@@ -2,8 +2,8 @@
 #include "common.h"
 
 #include "glutils.h"
-#include "resource.h"
 #include "material.h"
+#include "resource.h"
 
 namespace diorama {
 

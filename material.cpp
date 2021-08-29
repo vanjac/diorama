@@ -1,9 +1,9 @@
 #include "material.h"
 #include "shadersource.h"
+#include "world.h"
 #include <cstdio>
 #include <exception>
 #include <GL/gl3w.h>
-#include "world.h"
 
 namespace diorama {
 

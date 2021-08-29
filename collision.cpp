@@ -1,6 +1,6 @@
 #include "collision.h"
-#include <glm/gtx/norm.hpp>
 #include <limits>
+#include <glm/gtx/norm.hpp>
 
 namespace diorama::physics {
 

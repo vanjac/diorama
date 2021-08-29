@@ -1,9 +1,9 @@
 #pragma once
 
-#include <glm/glm.hpp>
 #include "common.h"
-#include "world.h"
 #include "glutils.h"
+#include "world.h"
+#include <glm/glm.hpp>
 
 namespace diorama::render {
 
