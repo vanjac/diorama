@@ -16,6 +16,7 @@ extern "C"
     __declspec(dllexport) int AmdPowerXpressRequestHighPerformance = 1;
 }
 
+std::ostream & operator<<(std::ostream &o, SDL_version version);
 void messageCallback(GLenum source, GLenum type, GLuint id, GLenum severity,
                      GLsizei length, const GLchar *msg, const void *data);
 
@@ -24,9 +25,8 @@ int main(int argc, char *argv[])
     SDL_version compiled, linked;
     SDL_VERSION(&compiled);
     SDL_GetVersion(&linked);
-    printf("SDL version: %d.%d.%d (compiled), %d.%d.%d (linked)\n",
-       compiled.major, compiled.minor, compiled.patch,
-        linked.major, linked.minor, linked.patch);
+    cout << "SDL version: " <<compiled<< " (compiled), "
+        <<linked<< " (linked)\n";
     
     SDL_Init(SDL_INIT_VIDEO);
     SDL_Window *window = SDL_CreateWindow("diorama",
@@ -34,7 +34,7 @@ int main(int argc, char *argv[])
         800, 600,
         SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);  // TODO highdpi?
     if (!window) {
-        printf("couldn't create window! %s\n", SDL_GetError());
+        cout << "couldn't create window! " <<SDL_GetError()<< "\n";
         SDL_Quit();
         return EXIT_FAILURE;
     }
@@ -50,20 +50,20 @@ int main(int argc, char *argv[])
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
     SDL_GLContext gl_context = SDL_GL_CreateContext(window);
     if (!gl_context) {
-        printf("Couldn't create OpenGL context: %s\n", SDL_GetError());
+        cout << "Couldn't create OpenGL context: " <<SDL_GetError()<< "\n";
         SDL_Quit();
         return 1;
     }
     SDL_GL_SetSwapInterval(1);  // enable vsync
 
     if (gl3wInit()) {
-        printf("error initializing OpenGL\n");
+        cout << "error initializing OpenGL\n";
         SDL_Quit();
         return EXIT_FAILURE;
     }
 
-    printf("OpenGL renderer: %s\n", glGetString(GL_RENDERER));
-    printf("OpenGL version: %s\n", glGetString(GL_VERSION));
+    cout << "OpenGL renderer: " <<glGetString(GL_RENDERER)<< "\n";
+    cout << "OpenGL version: " <<glGetString(GL_VERSION)<< "\n";
 
 #ifdef OPENGL_DEBUG
     // requires KHR_debug or OpenGL 4.3+
@@ -85,7 +85,7 @@ int main(int argc, char *argv[])
         diorama::Game game(window);
         result = game.main(args);
     } catch (std::exception e) {
-        printf("%s\n", e.what());
+        cout <<e.what()<< "\n";
         result = EXIT_FAILURE;
     }
 
@@ -94,10 +94,14 @@ int main(int argc, char *argv[])
     return result;
 }
 
-
+std::ostream & operator<<(std::ostream &o, SDL_version version)
+{
+    return o <<(int)version.major<< "." <<(int)version.minor<< "."
+        <<(int)version.patch;
+}
 
 void messageCallback(GLenum source, GLenum type, GLuint id, GLenum severity,
                      GLsizei length, const GLchar *msg, const void *data)
 {
-    printf("[OpenGL] %s\n", msg);
+    cout << "[OpenGL] " <<msg<< "\n";
 }

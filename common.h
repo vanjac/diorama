@@ -18,6 +18,9 @@ using std::unordered_map;
 #include <initializer_list>
 using std::initializer_list;
 
+#include <iostream>
+using std::cout;
+
 namespace diorama {
 
 class noncopyable {

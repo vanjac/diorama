@@ -1,5 +1,4 @@
 #include "world.h"
-#include <cstdio>
 
 namespace diorama {
 
@@ -28,13 +27,13 @@ void World::setRoot(Component *root)
 
 void World::addComponent(Component *component)
 {
-    printf("add component %s\n", component->name.c_str());  // TODO
+    cout << "add component " <<component->name<< "\n";  // TODO
     names[component->name].push_back(component);
 }
 
 void World::removeComponent(Component *component)
 {
-    printf("remove component %s\n", component->name.c_str());  // TODO
+    cout << "remove component " <<component->name<< "\n";  // TODO
     auto &nameVec = names[component->name];
     auto compIt = std::find(nameVec.begin(), nameVec.end(), component);
     if (compIt != nameVec.end())

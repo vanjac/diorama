@@ -1,6 +1,5 @@
 #include "game.h"
 #include "load_skp.h"
-#include <cstdio>
 #include <cstdlib>
 #include <glm/gtc/matrix_transform.hpp>
 
@@ -17,12 +16,12 @@ Game::Game(SDL_Window *window)
 int Game::main(const vector<string> args)
 {
     if (args.size() < 2) {
-        printf("please specify a path\n");
+        cout << "please specify a path\n";
         return EXIT_FAILURE;
     }
     string path = args[1];
     if (path.compare(path.length() - 4, 4, ".skb") == 0) {
-        printf("that's a backup file! look for .skp extension instead\n");
+        cout << "that's a backup file! look for .skp extension instead\n";
         return EXIT_FAILURE;
     }
 

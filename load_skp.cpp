@@ -1,8 +1,8 @@
 #include "load_skp.h"
-#include <cstdio>
 #include <exception>
 #include <map>
 #include <glm/gtc/type_ptr.hpp>
+#include <glm/gtx/string_cast.hpp>
 
 #define CHECK(op) (checkError((op), __LINE__))
 
@@ -20,7 +20,7 @@ SkpLoader::SkpLoader(string path, World *world, const ShaderManager *shaders)
     : world(world)
     , shaders(shaders)
 {
-    printf("Loading from %s\n", path.c_str());
+    cout << "Loading from " <<path<< "\n";
     SUInitialize();
 
     if (CHECK(SUModelCreateFromFile(&model, path.c_str())))
@@ -98,8 +98,7 @@ void SkpLoader::loadGlobal()
         SUStringRef nameStr = createString();
         CHECK(SUComponentDefinitionGetName(defPair.second, &nameStr));
         component->name = convertStringAndRelease(&nameStr);
-        printf("Definition %d: %s\n",
-            defPair.first, component->name.c_str());
+        cout << "Definition " <<defPair.first<< ": " <<component->name<< "\n";
 
         SUEntitiesRef entities = SU_INVALID;
         CHECK(SUComponentDefinitionGetEntities(defPair.second, &entities));
@@ -116,7 +115,7 @@ Component * SkpLoader::loadRoot()
     root->name = "root";
     SUEntitiesRef entities = SU_INVALID;
     CHECK(SUModelGetEntities(model, &entities));
-    printf("Model:\n");
+    cout << "Model:\n";
     loadEntities(entities, root);
     return root;
 }
@@ -154,7 +153,7 @@ void SkpLoader::loadEntities(SUEntitiesRef entities, Component *component)
         int32_t imageID = getID(SUImageToEntity(images[i]));
         auto instIt = imageInstances.find(imageID);
         if (instIt == imageInstances.end()) {
-            printf("  Image instance %d not found!\n", imageID);
+            cout << "  Image instance " <<imageID<< " not found!\n";
             continue;
         }
         loadInstance(instIt->second)->setParent(component);
@@ -168,7 +167,7 @@ Component * SkpLoader::loadInstance(SUComponentInstanceRef instance)
     int32_t definitionID = getID(SUComponentDefinitionToEntity(definition));
     auto defIt = componentDefinitions.find(definitionID);
     if (defIt == componentDefinitions.end()) {
-        printf("  Definition %d not loaded!\n", definitionID);
+        cout << "  Definition " <<definitionID<< " not loaded!\n";
         return new Component;
     }
 
@@ -177,8 +176,7 @@ Component * SkpLoader::loadInstance(SUComponentInstanceRef instance)
     SUStringRef nameStr = createString();
     CHECK(SUComponentInstanceGetName(instance, &nameStr));
     string name = convertStringAndRelease(&nameStr);
-    printf("  Instance %s of %d\n", name.c_str(),
-        definitionID);
+    cout << "  Instance " <<name<< " of " <<definitionID<< "\n";
     // instances with empty names use the name of their definition
     // this matches the behavior of Dynamic Components
     if (!name.empty())
@@ -197,7 +195,7 @@ Component * SkpLoader::loadInstance(SUComponentInstanceRef instance)
         if (matIt != loadedMaterials.end()) {
             component->material = matIt->second;
         } else {
-            printf("    Material %d not loaded!\n", materialID);
+            cout << "    Material " <<materialID<< " not loaded!\n";
         }
     }  // otherwise leave the component's current material
 
@@ -285,7 +283,7 @@ Mesh * SkpLoader::loadMesh(SUEntitiesRef entities)
             if (matIt != loadedMaterials.end()) {
                 primitive.material = matIt->second;
             } else {
-                printf("  Material %d not loaded!\n", materialID);
+                cout << "  Material " <<materialID<< " not loaded!\n";
             }
         }
 
@@ -299,7 +297,7 @@ Mesh * SkpLoader::loadMesh(SUEntitiesRef entities)
         primitive.setIndices(build.indices.size(), &build.indices[0]);
     }
 
-    printf("  %zu primitives\n", mesh->render.size());
+    cout << "  " <<mesh->render.size()<< " primitives\n";
     return mesh;
 }
 
@@ -308,8 +306,8 @@ Material * SkpLoader::loadMaterial(SUMaterialRef suMaterial)
     SUStringRef nameStr = createString();
     CHECK(SUMaterialGetName(suMaterial, &nameStr));
     string name = convertStringAndRelease(&nameStr);
-    printf("Material %d: %s\n", getID(SUMaterialToEntity(suMaterial)),
-        name.c_str());
+    cout << "Material " <<getID(SUMaterialToEntity(suMaterial))<< ": "
+        <<name<< "\n";
 
     Material * material = new Material;
     world->addResource(material);
@@ -317,7 +315,7 @@ Material * SkpLoader::loadMaterial(SUMaterialRef suMaterial)
     bool transparent;
     CHECK(SUMaterialIsDrawnTransparent(suMaterial, &transparent));
     if (transparent)
-        printf("  Material is transparent\n");
+        cout << "  Material is transparent\n";
     material->order = transparent ? RenderOrder::Transparent
         : RenderOrder::Opaque;
 
@@ -330,9 +328,7 @@ Material * SkpLoader::loadMaterial(SUMaterialRef suMaterial)
         material->shader = &shaders->coloredProg;
         material->color = colorToVec(color);
         material->texture = &Texture::NO_TEXTURE;
-        printf("  Solid color %f %f %f %f\n",
-            material->color.r, material->color.g, material->color.b,
-            material->color.a);
+        cout << "  Solid color " <<glm::to_string(material->color)<< "\n";
     } else {
         SUTextureRef texture = SU_INVALID;
         CHECK(SUMaterialGetTexture(suMaterial, &texture));
@@ -351,10 +347,10 @@ Material * SkpLoader::loadMaterial(SUMaterialRef suMaterial)
             SUMaterialColorizeType type;
             CHECK(SUMaterialGetColorizeType(suMaterial, &type));
             if (type == SUMaterialColorizeType_Tint) {
-                printf("  Colorize (tint)\n");
+                cout << "  Colorize (tint)\n";
                 material->shader = &shaders->tintedTextureProg;
             } else if (type == SUMaterialColorizeType_Shift) {
-                printf("  Colorize (shift)\n");
+                cout << "  Colorize (shift)\n";
                 material->shader = &shaders->shiftedTextureProg;
             }
 
@@ -379,11 +375,11 @@ Texture * SkpLoader::loadTexture(SUTextureRef suTexture)
 
     auto texIt = loadedTextures.find(fileName);
     if (texIt != loadedTextures.end()) {
-        printf("  Already loaded %s\n", fileName.c_str());
+        cout << "  Already loaded " <<fileName<< "\n";
         return texIt->second;
     }
-    printf("  Texture %s\n", fileName.c_str());
-    
+    cout << "  Texture " <<fileName<< "\n";
+
     SUImageRepRef image = SU_INVALID;
     CHECK(SUImageRepCreate(&image));  // uncolorized
     CHECK(SUTextureGetImageRep(suTexture, &image));
@@ -444,50 +440,50 @@ SUResult SkpLoader::checkError(SUResult result, int line)
 {
     if (!result)
         return result;
-    printf("SU Error line %d: ", line);
+    cout << "SU Error line %d: ", line;
     switch (result) {
         case SU_ERROR_NULL_POINTER_INPUT:
-            printf("Null pointer input\n");     break;
+            cout << "Null pointer input\n";     break;
         case SU_ERROR_INVALID_INPUT:
-            printf("Invalid input\n");          break;
+            cout << "Invalid input\n";          break;
         case SU_ERROR_NULL_POINTER_OUTPUT:
-            printf("Null pointer output\n");    break;
+            cout << "Null pointer output\n";    break;
         case SU_ERROR_INVALID_OUTPUT:
-            printf("Invalid output\n");         break;
+            cout << "Invalid output\n";         break;
         case SU_ERROR_OVERWRITE_VALID:
-            printf("Overwrite valid\n");        break;
+            cout << "Overwrite valid\n";        break;
         case SU_ERROR_GENERIC:
-            printf("Generic\n");                break;
+            cout << "Generic\n";                break;
         case SU_ERROR_SERIALIZATION:
-            printf("Serialization\n");          break;
+            cout << "Serialization\n";          break;
         case SU_ERROR_OUT_OF_RANGE:
-            printf("Out of range\n");           break;
+            cout << "Out of range\n";           break;
         case SU_ERROR_NO_DATA:
-            printf("No data\n");                break;
+            cout << "No data\n";                break;
         case SU_ERROR_INSUFFICIENT_SIZE:
-            printf("Insufficient size\n");      break;
+            cout << "Insufficient size\n";      break;
         case SU_ERROR_UNKNOWN_EXCEPTION:
-            printf("Unknown exception\n");      break;
+            cout << "Unknown exception\n";      break;
         case SU_ERROR_MODEL_INVALID:
-            printf("Invalid\n");                break;
+            cout << "Invalid\n";                break;
         case SU_ERROR_MODEL_VERSION:
-            printf("Version\n");                break;
+            cout << "Version\n";                break;
         case SU_ERROR_LAYER_LOCKED:
-            printf("Locked\n");                 break;
+            cout << "Locked\n";                 break;
         case SU_ERROR_DUPLICATE:
-            printf("Duplicate\n");              break;
+            cout << "Duplicate\n";              break;
         case SU_ERROR_PARTIAL_SUCCESS:
-            printf("Partial success\n");        break;
+            cout << "Partial success\n";        break;
         case SU_ERROR_UNSUPPORTED:
-            printf("Unsupported\n");            break;
+            cout << "Unsupported\n";            break;
         case SU_ERROR_INVALID_ARGUMENT:
-            printf("Invalid argument\n");       break;
+            cout << "Invalid argument\n";       break;
         case SU_ERROR_ENTITY_LOCKED:
-            printf("Locked\n");                 break;
+            cout << "Locked\n";                 break;
         case SU_ERROR_INVALID_OPERATION:
-            printf("Invalid operation\n");      break;
+            cout << "Invalid operation\n";      break;
         default:
-            printf("Unknown\n");                break;
+            cout << "Unknown\n";                break;
     }
     return result;
 }

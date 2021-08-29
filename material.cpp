@@ -1,7 +1,6 @@
 #include "material.h"
 #include "shadersource.h"
 #include "world.h"
-#include <cstdio>
 #include <exception>
 #include <GL/gl3w.h>
 
@@ -31,7 +30,7 @@ void ShaderProgram::link(string name, initializer_list<GLShader> shaders) {
         glGetProgramiv(glProgram, GL_INFO_LOG_LENGTH, &logLen);
         unique_ptr<char[]> log(new char[logLen]);
         glGetProgramInfoLog(glProgram, logLen, NULL, log.get());
-        printf("%s link error: %s", name.c_str(), log.get());
+        cout <<name<< " link error: " <<log.get()<< "\n";
         throw std::exception("Program link error");
     }
 
@@ -112,7 +111,7 @@ GLShader ShaderManager::compileShader(GLShaderType type, string name,
         glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &logLen);
         unique_ptr<char[]> log(new char[logLen]);
         glGetShaderInfoLog(shader, logLen, NULL, log.get());
-        printf("%s compile error: %s", name.c_str(), log.get());
+        cout <<name<< " compile error: " <<log.get()<< "\n";
         throw std::exception("Shader compile error");
     }
     return shader;
