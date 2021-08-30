@@ -2,6 +2,7 @@
 #include "common.h"
 
 #include "render.h"
+#include "collision.h"
 #include "world.h"
 #include <glm/glm.hpp>
 #include <SDL.h>
@@ -26,10 +27,12 @@ private:
     ShaderManager shaders;
 
     float camYaw = 0, camPitch = 0;
-    glm::vec3 camPos{0, 0, 0};
+    glm::vec3 camPos{0, 0, 128};
     glm::vec3 flyPos{0, 0, 0};
     glm::vec3 flyNeg{0, 0, 0};
     float flySpeed = 70.0f;  // inches per second
+
+    vector<physics::CollisionInfo> playerCollisions;
 };
 
 }  // namespace

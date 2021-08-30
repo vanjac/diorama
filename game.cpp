@@ -7,6 +7,7 @@ namespace diorama {
 
 const float LOOK_SPEED = 0.007;
 const float FLY_SPEED_ADJUST = 0.2f;
+const float PLAYER_RADIUS = 24.0f;
 
 Game::Game(SDL_Window *window)
     : window(window)
@@ -76,12 +77,33 @@ void Game::main(const vector<string> args)
 
         Transform camTransform = Transform::rotate(camYaw, Transform::UP);
         camTransform *= Transform::rotate(camPitch, Transform::RIGHT);
+        
         glm::vec3 flyVec = flyPos + flyNeg;
         if (flyVec != glm::vec3(0)) {
             flyVec = glm::normalize(flyVec);
             flyVec *= deltaTime * flySpeed;
         }
-        camPos += camTransform.transformVector(flyVec);
+        flyVec = camTransform.transformVector(flyVec);
+        glm::vec3 testPos = camPos + flyVec;
+
+        playerCollisions.clear();
+        physics::sphereCollision(&world, testPos, PLAYER_RADIUS,
+                                 playerCollisions);
+        glm::vec3 totalNormal{0};
+        for (auto &collision : playerCollisions) {
+            glm::vec3 toCenter = testPos - collision.point;
+            float depth = PLAYER_RADIUS - glm::length(toCenter);
+            // alternatively use normalize(toCenter) instead
+            totalNormal += collision.normal * depth;
+        }
+        totalNormal = glm::normalize(totalNormal);
+        float flyVecDotNormal = glm::dot(flyVec, totalNormal);
+        if (flyVecDotNormal < 0) {
+            // project flyVec onto plane with normal
+            flyVec -= totalNormal * flyVecDotNormal;
+        }
+
+        camPos += flyVec;
         camTransform = Transform::translate(camPos) * camTransform;
 
         renderer.render(&world, camTransform);
