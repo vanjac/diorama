@@ -69,7 +69,7 @@ const vector<Component *> Component::children() const
     return _children;
 }
 
-Component * Component::cloneHierarchy()
+Component * Component::cloneHierarchy() const
 {
     Component *copy = new Component(*this);
     for (auto &child : _children) {

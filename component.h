@@ -33,7 +33,7 @@ public:
     void setParent(Component *parent);
     const vector<Component *> children() const;
 
-    Component * cloneHierarchy();
+    Component * cloneHierarchy() const;
 
     World * world() const;
     void setWorld(World *world);  // called by World
